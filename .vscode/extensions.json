@@ -1,5 +1,15 @@
 {
   "recommendations": [
-    "svelte.svelte-vscode"
+    "svelte.svelte-vscode",
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "mikestead.dotenv",
+    "eamodio.gitlens",
+    "visualstudioexptteam.vscodeintellicode",
+    "ms-vscode.vscode-typescript-next",
+    "pkief.material-icon-theme",
+    "christian-kohler.npm-intellisense",
+    "rvest.vs-code-prettier-eslint",
+    "yoavbls.pretty-ts-errors"
   ]
 }
