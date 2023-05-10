@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Space Traders</string>
+    <string name="title_activity_main">Space Traders</string>
+    <string name="package_name">com.danoaky.spacetraders</string>
+    <string name="custom_url_scheme">com.danoaky.spacetraders</string>
+</resources>
