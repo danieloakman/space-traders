@@ -21,6 +21,7 @@ const config = {
 			$components: './src/lib/components',
 			$services: './src/lib/services',
 			$utils: './src/lib/utils',
+			$icons: './src/lib/icons',
 		},
 	}
 };

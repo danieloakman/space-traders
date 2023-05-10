@@ -10,6 +10,7 @@
     "pkief.material-icon-theme",
     "christian-kohler.npm-intellisense",
     "rvest.vs-code-prettier-eslint",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "csstools.postcss"
   ]
 }

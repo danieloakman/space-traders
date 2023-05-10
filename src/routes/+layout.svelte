@@ -6,6 +6,10 @@
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	// import SvelteLogo from 'virtual:icons/logos/svelte-icon';
+	// import SvelteLogo from 'virtual:icons/vscode-icons/file-type-svelte';
+	// import CheckSmall from 'virtual:icons/material-symbols/check-small';
+	import { CheckSmall } from '$icons';
 </script>
 
 <!-- App Shell -->
@@ -13,7 +17,7 @@
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
 		<AppBar>
-			<svelte:fragment slot="lead">
+			<!-- <svelte:fragment slot="lead">
 				<strong class="text-xl uppercase">Skeleton</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
@@ -41,7 +45,10 @@
 				>
 					GitHub
 				</a>
-			</svelte:fragment>
+			</svelte:fragment> -->
+			<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
+			(title)
+			<svelte:fragment slot="trail">(actions)</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
 	<!-- Page Route Content -->
