@@ -10,6 +10,12 @@ dependencies:
   '@capacitor/filesystem':
     specifier: ^5.0.2
     version: 5.0.2(@capacitor/core@5.0.2)
+  iteragain-es:
+    specifier: ^3.16.0
+    version: 3.16.0
+  svelte-asyncable:
+    specifier: ^2.1.1
+    version: 2.1.1(svelte@3.59.1)
 
 devDependencies:
   '@capacitor/cli':
@@ -1730,6 +1736,10 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
+  /iteragain-es@3.16.0:
+    resolution: {integrity: sha512-V7KcRsvQlVvAljLSwOPfPdOml2fj9nK7KVT2w6DGe2493vwnubn1lVRxNhF8AZzetqvn4B7dtssKkELWWDvDRw==}
+    dev: false
+
   /jiti@1.18.2:
     resolution: {integrity: sha512-QAdOptna2NYiSSpv0O/BwoHBSmz4YhpzJHyi+fnMRTXFjp7B8i/YG5Z8IfusxB1ufjcD2Sre1F3R+nX3fvy7gg==}
     hasBin: true
@@ -2564,6 +2574,15 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /svelte-asyncable@2.1.1(svelte@3.59.1):
+    resolution: {integrity: sha512-UVJ+CwUoCuimMJFTGtqLzdRs2SMaI/fE2wT5BvpsPW54jB9j9t27RW2hiFd5Bhl9yDvL1s+A6Lg0kKGvR2h/Qw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      svelte: 3.x
+    dependencies:
+      svelte: 3.59.1
+    dev: false
+
   /svelte-check@3.3.2(postcss@8.4.23)(svelte@3.59.1):
     resolution: {integrity: sha512-67j3rI0LDc2DvL0ON/2pvCasVVD3nHDrTkZNr4eITNfo2oFXdw7SIyMOiFj4swu+pjmFQAigytBK1IWyik8dBw==}
     hasBin: true
@@ -2666,7 +2685,6 @@ packages:
   /svelte@3.59.1:
     resolution: {integrity: sha512-pKj8fEBmqf6mq3/NfrB9SLtcJcUvjYSWyePlfCqN9gujLB25RitWK8PvFzlwim6hD/We35KbPlRteuA6rnPGcQ==}
     engines: {node: '>= 8'}
-    dev: true
 
   /tailwindcss@3.3.2:
     resolution: {integrity: sha512-9jPkMiIBXvPc2KywkraqsUfbfj+dHDb+JPWtSJa9MLFdrPyazI7q6WX2sUrm7R9eVR7qqv3Pas7EvQFzxKnI6w==}
