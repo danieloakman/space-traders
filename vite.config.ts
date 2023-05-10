@@ -7,8 +7,8 @@ export default defineConfig({
 		sveltekit(),
 		Icons({
 			compiler: 'svelte',
-			autoInstall: true,
-		}),
+			autoInstall: true
+		})
 	],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']

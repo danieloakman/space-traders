@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
 	// The ordering of these imports is critical to your app working properly
 	import '@skeletonlabs/skeleton/themes/theme-rocket.css';
 	// If you have source.organizeImports set to true in VSCode, then it will auto change this ordering
@@ -48,30 +48,30 @@
 					GitHub
 				</a>
 			</svelte:fragment> -->
-			<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
+			<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
 			(title)
 			<svelte:fragment slot="trail">(actions)</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
 
 	<svelte:fragment slot="footer">
-		<TabGroup 
-	justify="justify-center"
-	active="variant-filled-primary"
-	hover="hover:variant-soft-primary"
-	flex="flex-1 lg:flex-none"
-	rounded=""
-	border=""
-	class="bg-surface-100-800-token w-full"
->
-	<Tab bind:group={tabsBottomNav} name="books" value={0}>
-		<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
-	</Tab>
-	<Tab bind:group={tabsBottomNav} name="books" value={1}>
-		<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
-	</Tab>
-	<!-- ... -->
-</TabGroup>
+		<TabGroup
+			justify="justify-center"
+			active="variant-filled-primary"
+			hover="hover:variant-soft-primary"
+			flex="flex-1 lg:flex-none"
+			rounded=""
+			border=""
+			class="bg-surface-100-800-token w-full"
+		>
+			<Tab bind:group={tabsBottomNav} name="books" value={0}>
+				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
+			</Tab>
+			<Tab bind:group={tabsBottomNav} name="books" value={1}>
+				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
+			</Tab>
+			<!-- ... -->
+		</TabGroup>
 	</svelte:fragment>
 	<!-- Page Route Content -->
 	<slot />

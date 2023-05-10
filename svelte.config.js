@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static'
+import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -21,8 +21,8 @@ const config = {
 			$components: './src/lib/components',
 			$services: './src/lib/services',
 			$utils: './src/lib/utils',
-			$icons: './src/lib/icons',
-		},
+			$icons: './src/lib/icons'
+		}
 	}
 };
 

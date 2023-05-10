@@ -93,5 +93,12 @@
 		"text",
 		"track",
 		"width"
-	]
+	],
+	// "[svelte]": {
+	// 	"editor.defaultFormatter": "svelte.svelte-vscode"
+	// },
+	// "[typescript]": {
+	// 	"editor.defaultFormatter": "svelte.svelte-vscode"
+	// },
+	"editor.defaultFormatter": "svelte.svelte-vscode"
 }
