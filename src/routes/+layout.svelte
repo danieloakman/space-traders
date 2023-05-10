@@ -5,11 +5,13 @@
 	import '@skeletonlabs/skeleton/styles/skeleton.css';
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, TabGroup, Tab } from '@skeletonlabs/skeleton';
 	// import SvelteLogo from 'virtual:icons/logos/svelte-icon';
 	// import SvelteLogo from 'virtual:icons/vscode-icons/file-type-svelte';
 	// import CheckSmall from 'virtual:icons/material-symbols/check-small';
 	import { CheckSmall } from '$icons';
+
+	let tabsBottomNav = 0;
 </script>
 
 <!-- App Shell -->
@@ -50,6 +52,26 @@
 			(title)
 			<svelte:fragment slot="trail">(actions)</svelte:fragment>
 		</AppBar>
+	</svelte:fragment>
+
+	<svelte:fragment slot="footer">
+		<TabGroup 
+	justify="justify-center"
+	active="variant-filled-primary"
+	hover="hover:variant-soft-primary"
+	flex="flex-1 lg:flex-none"
+	rounded=""
+	border=""
+	class="bg-surface-100-800-token w-full"
+>
+	<Tab bind:group={tabsBottomNav} name="books" value={0}>
+		<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
+	</Tab>
+	<Tab bind:group={tabsBottomNav} name="books" value={1}>
+		<svelte:fragment slot="lead"><CheckSmall/></svelte:fragment>
+	</Tab>
+	<!-- ... -->
+</TabGroup>
 	</svelte:fragment>
 	<!-- Page Route Content -->
 	<slot />
