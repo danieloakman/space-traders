@@ -6,14 +6,18 @@ import { getAgentTokens, setAgentTokens } from '$services';
 import type { AgentToken } from '$lib';
 import { iter } from 'iteragain-es';
 
-export const agentTokens = asyncable(getAgentTokens, async ($newValue: AgentToken[], $prevValue: AgentToken[]) => {
-  await setAgentTokens(
-    iter($newValue)
-      .concat($prevValue)
-      .unique({ iteratee: agentToken => agentToken.token })
-      .toArray()
-  );
-});
+export const agentTokens = asyncable(
+	getAgentTokens,
+	async ($newValue: AgentToken[], $prevValue: AgentToken[]) => {
+    console.log('agentTokens changed', $newValue, $prevValue)
+		await setAgentTokens(
+			iter($newValue)
+				.concat($prevValue)
+				.unique({ iteratee: (agentToken) => agentToken.token })
+				.toArray()
+		);
+	}
+);
 
 // export interface EntityStore<T> {
 //   store: Readable<T>;
@@ -30,11 +34,11 @@ export const agentTokens = asyncable(getAgentTokens, async ($newValue: AgentToke
 //   }
 
 //   set(value: T): void {
-      
+
 //   }
 
 //   update(updater: Updater<T>): void {
-      
+
 //   }
 
 // }

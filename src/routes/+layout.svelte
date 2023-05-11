@@ -12,10 +12,11 @@
 	import { CheckSmall } from '$icons';
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	const tabSet = writable('/');
 	tabSet.subscribe((value) => {
-		goto(value);
+		if (browser) goto(value);
 	});
 </script>
 
