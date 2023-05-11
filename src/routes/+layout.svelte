@@ -10,8 +10,13 @@
 	// import SvelteLogo from 'virtual:icons/vscode-icons/file-type-svelte';
 	// import CheckSmall from 'virtual:icons/material-symbols/check-small';
 	import { CheckSmall } from '$icons';
+	import { writable } from 'svelte/store';
+	import { goto } from '$app/navigation';
 
-	let tabsBottomNav = 0;
+	const tabSet = writable('/');
+	tabSet.subscribe((value) => {
+		goto(value);
+	});
 </script>
 
 <!-- App Shell -->
@@ -64,10 +69,10 @@
 			border=""
 			class="bg-surface-100-800-token w-full"
 		>
-			<Tab bind:group={tabsBottomNav} name="books" value={0}>
+			<Tab bind:group={$tabSet} name="Home" value={'/'}>
 				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
 			</Tab>
-			<Tab bind:group={tabsBottomNav} name="books" value={1}>
+			<Tab bind:group={$tabSet} name="Agents" value={'/agents'}>
 				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
 			</Tab>
 			<!-- ... -->
