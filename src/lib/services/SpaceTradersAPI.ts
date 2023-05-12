@@ -1,6 +1,13 @@
 import type { AgentToken } from '$lib/types';
 import { AGENT_TOKENS_PATH, SECRETS_DIR, SPACE_TRADERS_URL } from '../constants';
 import { Directory, Filesystem, Encoding } from '@capacitor/filesystem';
+// import { AgentsApi, Configuration, FactionsApi } from 'spacetraders-sdk';
+
+// const f = new FactionsApi();
+// f.getFaction({ factionSymbol: 'OE' })
+
+// const a = new AgentsApi({  });
+// a.getMyAgent({  }).then(a => a.data.data))
 // import { agentTokens } from '../stores';
 
 export const DEFAULT_HEADERS = {

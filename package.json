@@ -11,7 +11,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"build:api": "./scripts/build-api.sh"
 	},
 	"devDependencies": {
 		"@capacitor/cli": "^5.0.2",
@@ -46,6 +47,7 @@
 		"@capacitor/core": "^5.0.2",
 		"@capacitor/filesystem": "^5.0.2",
 		"iteragain-es": "^3.16.0",
+		"spacetraders-sdk": "file:packages/spacetraders-sdk-2.0.0.tgz",
 		"svelte-asyncable": "^2.1.1"
 	}
 }
