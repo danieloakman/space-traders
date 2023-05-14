@@ -19,10 +19,12 @@ const config = {
 		}),
 		alias: {
 			$components: './src/lib/components',
-			$services: './src/lib/services',
-			$utils: './src/lib/utils',
 			$icons: './src/lib/icons',
-			$stores: './src/lib/stores'
+			$services: './src/lib/services',
+			$stores: './src/lib/stores',
+			$types: './src/lib/types',
+			$utils: './src/lib/utils',
+			$constants: './src/lib/constants.ts'
 		}
 	}
 };
