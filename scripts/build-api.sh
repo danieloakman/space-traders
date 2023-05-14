@@ -16,6 +16,7 @@ openapi-generator generate \
 
 
 cd spacetraders-sdk
+pnpm update axios@latest
 pnpm i
 pnpm pack
 mv spacetraders-sdk-2.0.0.tgz ../packages/spacetraders-sdk-2.0.0.tgz
@@ -23,5 +24,5 @@ cd ..
 pnpm add ./packages/spacetraders-sdk-2.0.0.tgz
 
 # Clean up:
-# rm -rf api-docs
+rm -rf api-docs
 rm -rf spacetraders-sdk
