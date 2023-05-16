@@ -2,19 +2,12 @@ import type { AgentToken } from '$lib/types';
 import { AGENT_TOKENS_PATH, SECRETS_DIR, SPACE_TRADERS_URL } from '../constants';
 import { Directory, Filesystem, Encoding } from '@capacitor/filesystem';
 import axios from './axios-instance';
-import {
-	AgentsApi,
-	Configuration,
-	FactionsApi,
-	SystemsApi,
-	type Agent,
-} from 'spacetraders-sdk';
+import { AgentsApi, Configuration, FactionsApi, SystemsApi, type Agent } from 'spacetraders-sdk';
 import { derived, get, writable, type Readable } from 'svelte/store';
-import { currentAgentToken, reloadable, type Reloadable } from '$stores';
-import { iife, pickData } from '$utils';
+import { pickData, reloadable, type Reloadable } from '$utils';
 import { asyncable } from 'svelte-asyncable';
 
-class SpaceTradersAPI {
+export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
 	readonly myAgent: Reloadable<Agent>;
 	protected readonly systemsAPI: Readable<SystemsApi>;
@@ -23,7 +16,7 @@ class SpaceTradersAPI {
 	constructor(protected readonly agentToken: Readable<string | null>) {
 		this.config = derived(
 			this.agentToken,
-			token =>
+			(token) =>
 				new Configuration({
 					accessToken: token ?? '',
 					basePath: SPACE_TRADERS_URL
@@ -39,12 +32,12 @@ class SpaceTradersAPI {
 		// 		store: derived([this.agentsAPI, reload], ([api]) => api.getMyAgent().then(data => data.data.data)),
 		// 	};
 		// });
-		this.systemsAPI = derived(this.config, config => new SystemsApi(config, undefined, axios));
-		this.agentsAPI = derived(this.config, config => new AgentsApi(config, undefined, axios));
+		this.systemsAPI = derived(this.config, (config) => new SystemsApi(config, undefined, axios));
+		this.agentsAPI = derived(this.config, (config) => new AgentsApi(config, undefined, axios));
 	}
 
 	registerAgent(symbol: string, faction: string) {
-		return axios.post('register')
+		return axios.post('register', {}, {});
 	}
 
 	systems(limit?: number, page?: number) {
@@ -55,8 +48,6 @@ class SpaceTradersAPI {
 		return get(this.agentsAPI).getMyAgent();
 	}
 }
-
-export const api = new SpaceTradersAPI(derived(currentAgentToken, agentToken => agentToken?.token ?? ''));
 
 export const DEFAULT_HEADERS = {
 	'Content-Type': 'application/json'

@@ -14,7 +14,6 @@ openapi-generator generate \
   --additional-properties=apiPackage="api" \
   --additional-properties=useSingleRequestParameter=true
 
-
 cd spacetraders-sdk
 pnpm update axios@latest
 pnpm i

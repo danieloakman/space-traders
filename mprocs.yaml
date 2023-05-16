@@ -1,0 +1,31 @@
+procs:
+  dev:
+    shell: 'pnpm dev'
+    autostart: true
+  build:
+    shell: 'pnpm build'
+    autostart: false
+  build:api:
+    shell: 'pnpm build:api'
+    autostart: false
+  preview:
+    shell: 'pnpm preview'
+    autostart: false
+  test:
+    shell: 'pnpm test'
+    autostart: false
+  test:unit:
+    shell: 'pnpm test:unit'
+    autostart: false
+  check:
+    shell: 'pnpm check'
+    autostart: false
+  check:watch:
+    shell: 'pnpm check:watch'
+    autostart: false
+  lint:
+    shell: 'pnpm lint'
+    autostart: false
+  format:
+    shell: 'pnpm format'
+    autostart: false

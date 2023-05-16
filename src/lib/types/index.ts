@@ -15,4 +15,6 @@ export interface RecursiveData<T> {
 	data: T | RecursiveData<T>;
 }
 
-export type PickData<T extends RecursiveData<any>> = T['data'] extends RecursiveData<any> ? PickData<T['data']> : T['data'];
+export type PickData<T extends RecursiveData<any>> = T['data'] extends RecursiveData<any>
+	? PickData<T['data']>
+	: T['data'];
