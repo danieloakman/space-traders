@@ -1,7 +1,7 @@
 import { sleep } from '$utils';
 import Axios from 'axios';
 
-const axios = Axios.create();
+const axios = Axios.create({ headers: { 'Content-Type': 'application/json' } });
 
 axios.interceptors.response.use(undefined, async (e) => {
 	const apiError = e.response?.data?.error;

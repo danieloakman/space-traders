@@ -1,8 +1,16 @@
-import type { AgentToken } from '$lib/types';
+import type { AgentToken, RegisterResponse } from '$lib/types';
 import { AGENT_TOKENS_PATH, SECRETS_DIR, SPACE_TRADERS_URL } from '../constants';
 import { Directory, Filesystem, Encoding } from '@capacitor/filesystem';
 import axios from './axios-instance';
-import { AgentsApi, Configuration, FactionsApi, SystemsApi, type Agent } from 'spacetraders-sdk';
+import {
+	AgentsApi,
+	Configuration,
+	FactionsApi,
+	SystemsApi,
+	type Register201Response,
+	type Agent,
+	type RegisterRequestFactionEnum
+} from 'spacetraders-sdk';
 import { derived, get, writable, type Readable } from 'svelte/store';
 import { pickData, reloadable, type Reloadable } from '$utils';
 import { asyncable } from 'svelte-asyncable';
@@ -23,64 +31,40 @@ export class SpaceTradersAPI {
 				})
 		);
 		this.myAgent = reloadable(asyncable(() => get(this.agentsAPI).getMyAgent().then(pickData)));
-		// this.myAgent = iife(() => {
-		// 	const reload = writable(0);
-		// 	return {
-		// 		reload: () => {
-		// 			reload.update(n => n + 1);
-		// 		},
-		// 		store: derived([this.agentsAPI, reload], ([api]) => api.getMyAgent().then(data => data.data.data)),
-		// 	};
-		// });
 		this.systemsAPI = derived(this.config, (config) => new SystemsApi(config, undefined, axios));
 		this.agentsAPI = derived(this.config, (config) => new AgentsApi(config, undefined, axios));
 	}
 
-	registerAgent(symbol: string, faction: string) {
-		return axios.post('register', {}, {});
+	async registerAgent(
+		symbol: string,
+		faction: RegisterRequestFactionEnum
+	): Promise<RegisterResponse> {
+		const res: RegisterResponse = await axios
+			.post(
+				SPACE_TRADERS_URL + 'register',
+				JSON.stringify({
+					symbol,
+					faction
+				})
+			)
+			.then(pickData);
+		console.log({ res });
+		await addAgentToken({ symbol, token: res.token });
+		return res;
 	}
 
 	systems(limit?: number, page?: number) {
 		return get(this.systemsAPI).getSystems({ limit, page });
 	}
 
-	a() {
-		return get(this.agentsAPI).getMyAgent();
-	}
+	// a() {
+	// 	return this.registerAgent('test', 'COSMIC').then(d => d.)
+	// }
 }
 
 export const DEFAULT_HEADERS = {
 	'Content-Type': 'application/json'
 };
-
-export async function registerAgent(symbol: string, faction: string) {
-	console.log('registering agent:', symbol, faction);
-	const result = await fetch(SPACE_TRADERS_URL + `register`, {
-		method: 'POST',
-		headers: DEFAULT_HEADERS,
-		body: JSON.stringify({ symbol, faction })
-	});
-	const json = await result.json();
-	console.log(json);
-	return result;
-	// agentTokens.set(json);
-}
-
-export async function agentDetails(token: string): Promise<{
-	accountId: string;
-	symbol: string;
-	credits: number;
-	headquarters: string;
-}> {
-	const result = await fetch(SPACE_TRADERS_URL + `my/agent`, {
-		method: 'GET',
-		headers: {
-			...DEFAULT_HEADERS,
-			Authorization: `Bearer ${token}`
-		}
-	});
-	return (await result.json()).data;
-}
 
 export async function getAgentTokens() {
 	try {
@@ -103,4 +87,10 @@ export async function setAgentTokens(agentTokens: AgentToken[]) {
 		data: JSON.stringify(agentTokens),
 		encoding: Encoding.UTF8
 	});
+}
+
+export async function addAgentToken(agentToken: AgentToken) {
+	const agentTokens = await getAgentTokens();
+	agentTokens.push(agentToken);
+	await setAgentTokens(agentTokens);
 }

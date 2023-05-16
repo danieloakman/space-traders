@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { ListBox, ListBoxItem, Tab, TabGroup } from '@skeletonlabs/skeleton';
-	import { agentTokens } from '$stores';
-	import { agentDetails, registerAgent } from '$services';
+	import { agentTokens, api } from '$stores';
+	// import { agentDetails } from '$services';
 	import { writable } from 'svelte/store';
+	import type { RegisterRequestFactionEnum } from 'spacetraders-sdk';
 
 	const agent = {
 		symbol: '',
-		faction: 'COSMIC'
+		faction: 'COSMIC' as RegisterRequestFactionEnum
 	};
 	let newToken = '';
 	let agentToken = '';
@@ -36,7 +37,7 @@
 					type="button"
 					class="btn variant-filled"
 					on:click={async () => {
-						const result = await registerAgent(agent.symbol, agent.faction);
+						const result = await api.registerAgent(agent.symbol, agent.faction);
 					}}>Submit</button
 				>
 			</div>
@@ -51,9 +52,9 @@
 					type="button"
 					class="btn variant-filled"
 					on:click={async () => {
-						const result = await agentDetails(newToken);
-						console.log(result);
-						agentTokens.set([{ symbol: result.symbol, token: newToken }]);
+						// const result = await agentDetails(newToken);
+						// console.log(result);
+						// agentTokens.set([{ symbol: result.symbol, token: newToken }]);
 					}}>Submit</button
 				>
 			</div>
