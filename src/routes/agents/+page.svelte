@@ -1,17 +1,34 @@
 <script lang="ts">
 	import { ListBox, ListBoxItem, Tab, TabGroup } from '@skeletonlabs/skeleton';
-	import { agentTokens, api } from '$stores';
+	import { savedAgents, api, currentAgent } from '$stores';
 	// import { agentDetails } from '$services';
-	import { writable } from 'svelte/store';
+	import { get, writable } from 'svelte/store';
 	import type { RegisterRequestFactionEnum } from 'spacetraders-sdk';
+	import type { SavedAgent } from '$types';
+	import { Close } from '$icons';
 
 	const agent = {
 		symbol: '',
 		faction: 'COSMIC' as RegisterRequestFactionEnum
 	};
 	let newToken = '';
-	let agentToken = '';
+	let selectedAgent: SavedAgent = { symbol: '', token: '' };
 	let tabSet = 0;
+
+	console.log(get(currentAgent));
+
+	$: if (selectedAgent.token.length) {
+		currentAgent.update(() => selectedAgent);
+		// api.myAgent.reload();
+		console.time('myAgent');
+		api.myAgent.get().then((myAgent) => {
+			console.log({ myAgent });
+			console.timeEnd('myAgent');
+		});
+		api.headquarters.get().then((headquarters) => {
+			console.log({ headquarters });
+		});
+	}
 </script>
 
 <TabGroup justify="justify-center">
@@ -52,24 +69,31 @@
 					type="button"
 					class="btn variant-filled"
 					on:click={async () => {
-						// const result = await agentDetails(newToken);
-						// console.log(result);
-						// agentTokens.set([{ symbol: result.symbol, token: newToken }]);
+						const result = await api.agent(newToken);
+						console.log(result);
+						savedAgents.set([{ symbol: result.symbol, token: newToken }]);
 					}}>Submit</button
 				>
 			</div>
-			{#await $agentTokens}
+			{#await $savedAgents}
 				<p>Loading...</p>
 			{:then tokens}
 				{#if tokens.length > 0}
 					<div class="card p-4 m-4">
 						{#each tokens as token}
 							<ListBox>
-								<ListBoxItem bind:group={agentToken} name="medium" value={token.token}>
+								<ListBoxItem bind:group={selectedAgent} name="medium" value={token}>
 									<span>
 										{token.symbol}
 										<!-- {token.faction} -->
 									</span>
+									<button
+										type="button"
+										class="btn-icon variant-filled"
+										on:click={() => {
+											savedAgents.update((agents) => agents.filter((a) => a.token !== token.token));
+										}}><Close /></button
+									>
 								</ListBoxItem>
 							</ListBox>
 						{/each}

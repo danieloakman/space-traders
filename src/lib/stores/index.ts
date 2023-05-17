@@ -3,13 +3,13 @@ import { writable, readable, derived } from 'svelte/store';
 import type { Readable, Subscriber, Unsubscriber, Updater, Writable } from 'svelte/store';
 import { asyncable, type Asyncable, syncable } from 'svelte-asyncable';
 import { SpaceTradersAPI, getAgentTokens, setAgentTokens } from '$services';
-import type { AgentToken } from '$lib';
+import type { SavedAgent } from '$lib';
 import { iter } from 'iteragain-es';
 import { localStorageStore } from '@skeletonlabs/skeleton';
 
-export const agentTokens = asyncable(
+export const savedAgents = asyncable(
 	getAgentTokens,
-	async ($newValue: AgentToken[], $prevValue: AgentToken[]) => {
+	async ($newValue: SavedAgent[], $prevValue: SavedAgent[]) => {
 		console.log('agentTokens changed', $newValue, $prevValue);
 		await setAgentTokens(
 			iter($newValue)
@@ -20,10 +20,10 @@ export const agentTokens = asyncable(
 	}
 );
 
-export const currentAgentToken = localStorageStore<AgentToken | null>('currentAgentToken', null);
+export const currentAgent = localStorageStore<SavedAgent | null>('currentAgentToken', null);
 
 export const api = new SpaceTradersAPI(
-	derived(currentAgentToken, (agentToken) => agentToken?.token ?? '')
+	derived(currentAgent, (agentToken) => agentToken?.token ?? '')
 );
 
 // export interface EntityStore<T> {
