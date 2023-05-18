@@ -33,11 +33,14 @@ export class SpaceTradersAPI {
 		protected readonly agentToken: Readable<string>
 	) {
 		this.config = derived(this.agentToken, (token) => this.createConfig({ token }));
-		this.myAgent = reloadable(asyncable(() => get(this.agentsAPI).getMyAgent().then(unwrapData)), { readonly: true });
-		this.headquarters = reloadable(
-			asyncable(() => this.myAgent.get().then(agent => this.waypoint(agent.headquarters))),
+		this.myAgent = reloadable(
+			asyncable(() => get(this.agentsAPI).getMyAgent().then(unwrapData)),
 			{ readonly: true }
-		)
+		);
+		this.headquarters = reloadable(
+			asyncable(() => this.myAgent.get().then((agent) => this.waypoint(agent.headquarters))),
+			{ readonly: true }
+		);
 		this.agentsAPI = derived(this.config, this.createAgentsApi);
 		this.systemsAPI = derived(this.config, this.createSystemsApi);
 		this.contractsAPI = derived(this.config, this.createContractsApi);
@@ -111,7 +114,9 @@ export class SpaceTradersAPI {
 }
 
 export function fullWaypoint(...args: string[]): FullWaypoint {
-	const parts = iter(args).flatMap(str => str.split('-')).toArray();
+	const parts = iter(args)
+		.flatMap((str) => str.split('-'))
+		.toArray();
 	if (parts.length !== 3) {
 		console.error('Invalid args passed to fullWaypoint:', args);
 		return { sector: '', system: '', waypoint: '' };

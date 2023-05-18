@@ -9,7 +9,7 @@
 	// import SvelteLogo from 'virtual:icons/logos/svelte-icon';
 	// import SvelteLogo from 'virtual:icons/vscode-icons/file-type-svelte';
 	// import CheckSmall from 'virtual:icons/material-symbols/check-small';
-	import { CheckSmall } from '$icons';
+	import { Home, ReceiptLong, Rocket, Map } from '$icons';
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -54,7 +54,7 @@
 					GitHub
 				</a>
 			</svelte:fragment> -->
-			<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
+			<svelte:fragment slot="lead"><Home /></svelte:fragment>
 			(title)
 			<svelte:fragment slot="trail">(actions)</svelte:fragment>
 		</AppBar>
@@ -71,10 +71,16 @@
 			class="bg-surface-100-800-token w-full"
 		>
 			<Tab bind:group={$tabSet} name="Home" value={'/'}>
-				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
+				<svelte:fragment slot="lead"><Home /></svelte:fragment>
 			</Tab>
-			<Tab bind:group={$tabSet} name="Agents" value={'/agents'}>
-				<svelte:fragment slot="lead"><CheckSmall /></svelte:fragment>
+			<Tab bind:group={$tabSet} name="Contracts" value={'/contracts'}>
+				<svelte:fragment slot="lead"><ReceiptLong /></svelte:fragment>
+			</Tab>
+			<Tab bind:group={$tabSet} name="Navigation" value={'/navigation'}>
+				<svelte:fragment slot="lead"><Map /></svelte:fragment>
+			</Tab>
+			<Tab bind:group={$tabSet} name="ship" value={'/ship'}>
+				<svelte:fragment slot="lead"><Rocket /></svelte:fragment>
 			</Tab>
 			<!-- ... -->
 		</TabGroup>
