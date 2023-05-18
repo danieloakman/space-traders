@@ -7,6 +7,7 @@ import {
 	Configuration,
 	FactionsApi,
 	SystemsApi,
+	ContractsApi,
 	type Register201Response,
 	type Agent,
 	type RegisterRequestFactionEnum,
@@ -19,12 +20,18 @@ import { iter } from 'iteragain-es';
 
 export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
+	/** The current agent details. */
 	readonly myAgent: Reloadable<Agent>;
 	readonly headquarters: Reloadable<Waypoint>;
 	protected readonly agentsAPI: Readable<AgentsApi>;
 	protected readonly systemsAPI: Readable<SystemsApi>;
+	protected readonly contractsAPI: Readable<ContractsApi>;
+	protected readonly factionsAPI: Readable<FactionsApi>;
 
-	constructor(protected readonly agentToken: Readable<string>) {
+	constructor(
+		/** The agent token to use for all relevant API calls. */
+		protected readonly agentToken: Readable<string>
+	) {
 		this.config = derived(this.agentToken, (token) => this.createConfig({ token }));
 		this.myAgent = reloadable(asyncable(() => get(this.agentsAPI).getMyAgent().then(unwrapData)), { readonly: true });
 		this.headquarters = reloadable(
@@ -33,6 +40,8 @@ export class SpaceTradersAPI {
 		)
 		this.agentsAPI = derived(this.config, this.createAgentsApi);
 		this.systemsAPI = derived(this.config, this.createSystemsApi);
+		this.contractsAPI = derived(this.config, this.createContractsApi);
+		this.factionsAPI = derived(this.config, this.createFactionsApi);
 	}
 
 	async registerAgent(
@@ -53,6 +62,7 @@ export class SpaceTradersAPI {
 		return res;
 	}
 
+	/** Returns Agent data from a separate token. Does not return the agent details for the current agent. That */
 	agent(token: string): Promise<Agent> {
 		return this.createAgentsApi(this.createConfig({ token })).getMyAgent().then(unwrapData);
 	}
@@ -61,14 +71,19 @@ export class SpaceTradersAPI {
 		return get(this.systemsAPI).getSystems({ limit, page });
 	}
 
-	waypoint(sectorSystemWaypoint: string): Promise<Waypoint>;
-	waypoint(sectorSystem: string, waypoint: string): Promise<Waypoint>;
-	waypoint(sector: string, system: string, waypoint: string): Promise<Waypoint>
 	waypoint(...args: string[]): Promise<Waypoint> {
 		const wp = fullWaypoint(...args);
 		const systemSymbol = wp.system;
 		const waypointSymbol = wp.waypoint;
 		return get(this.systemsAPI).getWaypoint({ systemSymbol, waypointSymbol }).then(unwrapData);
+	}
+
+	contracts(limit?: number, page?: number) {
+		return get(this.contractsAPI).getContracts({ limit, page });
+	}
+
+	contract(id: string) {
+		return get(this.contractsAPI).getContract({ contractId: id }).then(unwrapData);
 	}
 
 	private createConfig(options: { token: string }) {
@@ -84,6 +99,14 @@ export class SpaceTradersAPI {
 
 	private createSystemsApi(config: Configuration) {
 		return new SystemsApi(config, undefined, axios);
+	}
+
+	private createContractsApi(config: Configuration) {
+		return new ContractsApi(config, undefined, axios);
+	}
+
+	private createFactionsApi(config: Configuration) {
+		return new FactionsApi(config, undefined, axios);
 	}
 }
 
