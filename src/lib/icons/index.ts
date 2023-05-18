@@ -20,6 +20,7 @@ import Map from 'virtual:icons/material-symbols/map';
 import Menu from 'virtual:icons/material-symbols/menu';
 import MenuOpen from 'virtual:icons/material-symbols/menu-open';
 import Refresh from 'virtual:icons/material-symbols/refresh';
+import Groups from 'virtual:icons/material-symbols/groups';
 export {
 	CheckSmall,
 	ChevronLeft,
@@ -36,6 +37,7 @@ export {
 	Map,
 	Menu,
 	MenuOpen,
-	Refresh
+	Refresh,
+	Groups,
 };
 // export * as MaterialIcons from 'virtual:icons/material-symbols';

@@ -8,7 +8,7 @@
 
 	import { AppShell, AppBar, TabGroup, Tab } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
-	import { Home, ReceiptLong, Rocket, Map, ChevronLeft, Menu, MenuOpen, Refresh } from '$icons';
+	import { Home, ReceiptLong, Rocket, Map, ChevronLeft, Menu, MenuOpen, Refresh, Groups } from '$icons';
 	import { derived, get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -104,6 +104,10 @@
 
 			<Tab bind:group={$tabSet} name="fleet" value={'/fleet'}>
 				<svelte:fragment slot="lead"><Rocket /></svelte:fragment>
+			</Tab>
+
+			<Tab bind:group={$tabSet} name="factions" value={'/factions'}>
+				<svelte:fragment slot="lead"><Groups /></svelte:fragment>
 			</Tab>
 		</TabGroup>
 	</svelte:fragment>

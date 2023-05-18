@@ -95,12 +95,18 @@ export class SpaceTradersAPI {
 		return get(this.contractsAPI).getContracts({ limit, page }).then(unwrapData);
 	}
 
+	// TODO: contracts should be a store instead of calling getContract like this.
 	contract(id: string) {
 		return get(this.contractsAPI).getContract({ contractId: id }).then(unwrapData);
 	}
 
 	acceptContract(id: string) {
 		return get(this.contractsAPI).acceptContract({ contractId: id }).then(unwrapData);
+	}
+
+	// TODO: factions should also be a store.
+	factions() {
+		return get(this.factionsAPI).getFactions().then(unwrapData);
 	}
 
 	private createConfig(options: { token: string }) {
