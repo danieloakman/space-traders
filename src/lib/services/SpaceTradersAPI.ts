@@ -99,6 +99,10 @@ export class SpaceTradersAPI {
 		return get(this.contractsAPI).getContract({ contractId: id }).then(unwrapData);
 	}
 
+	acceptContract(id: string) {
+		return get(this.contractsAPI).acceptContract({ contractId: id }).then(unwrapData);
+	}
+
 	private createConfig(options: { token: string }) {
 		return new Configuration({
 			accessToken: options.token,

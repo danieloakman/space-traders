@@ -13,3 +13,14 @@ export function unwrapData<T extends DataObject<any>>(data: T): UnwrapData<T> {
 		? unwrapData(data.data)
 		: data.data;
 }
+
+export function formatAPIResponse<T>(obj: T): T {
+	return JSON.parse(JSON.stringify(obj), (key, value) => {
+		if (typeof value === 'string') {
+			const date = new Date(value);
+			if (!isNaN(date.getTime()))
+				return date.toLocaleString();
+		}
+		return value;
+	});
+}

@@ -17,6 +17,9 @@ import Rocket from 'virtual:icons/material-symbols/rocket';
 import RocketLaunch from 'virtual:icons/material-symbols/rocket-launch';
 import Settings from 'virtual:icons/material-symbols/settings';
 import Map from 'virtual:icons/material-symbols/map';
+import Menu from 'virtual:icons/material-symbols/menu';
+import MenuOpen from 'virtual:icons/material-symbols/menu-open';
+import Refresh from 'virtual:icons/material-symbols/refresh';
 export {
 	CheckSmall,
 	ChevronLeft,
@@ -30,6 +33,9 @@ export {
 	Rocket,
 	RocketLaunch,
 	Settings,
-	Map
+	Map,
+	Menu,
+	MenuOpen,
+	Refresh
 };
 // export * as MaterialIcons from 'virtual:icons/material-symbols';

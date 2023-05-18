@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { api } from '$lib';
-  import { JsonView } from '@zerodevx/svelte-json-view'
+	import { JsonView } from '@zerodevx/svelte-json-view';
+	import { page } from '$app/stores';
+	import { formatAPIResponse } from '$utils';
+	import { goto } from '$app/navigation';
 
-
-	export let data;
-  let depth = Infinity;
+	let depth = 1;
 </script>
 
-{#await api.contract(data.id)}
+{#await api.contract($page.params.id)}
 	<section class="card w-full m-4 p-4">
 		<div class="space-y-4">
 			<div class="placeholder" />
@@ -25,38 +26,18 @@
 		</div>
 	</section>
 {:then contract}
-	<!-- <div class="card p-4 m-4">
-    <ul>
-      <li>
-        <span>ID: {contract.id}</span>
-      </li>
-      <li>
-        <span>Accepted: {contract.accepted}</span>
-      </li>
-      <li>
-        <span>Fullfilled: {contract.fulfilled}</span>
-      </li>
-      <li>
-        <span>Expires: {new Date(contract.expiration).toLocaleString()}</span>
-      </li>
-      <li>
-        <span>Faction: {contract.factionSymbol}</span>
-      </li>
-      <li>
-        <span>Type: {contract.type}</span>
-      </li>
-      <li>
-        <span>Terms:</span>
-        <ul>
-          <li>
-            <span>Good: {contract.terms.deliver[0].}</span>
-          </li>
-        </ul>
-      </li>
-    </ul>
-	</div> -->
-  <div class="ms-1">
-    <JsonView json={contract} {depth}/>
-  </div>
-  <button class="btn">Accept</button>
+	<div class="ms-2">
+		<JsonView json={formatAPIResponse(contract)} {depth} />
+	</div>
+
+	<div class="flex justify-center my-2">
+		<button
+			class="btn-lg variant-filled-primary"
+			on:click={async () => {
+				api.acceptContract(contract.id);
+			}}
+		>
+			Accept
+		</button>
+	</div>
 {/await}
