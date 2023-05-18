@@ -1,10 +1,10 @@
 import { Directory } from '@capacitor/filesystem';
-import { writable, readable, derived } from 'svelte/store';
+import { writable, readable, derived, get } from 'svelte/store';
 import type { Readable, Subscriber, Unsubscriber, Updater, Writable } from 'svelte/store';
 import { asyncable, type Asyncable, syncable } from 'svelte-asyncable';
 import { SpaceTradersAPI, getAgentTokens, setAgentTokens } from '$services';
 import type { SavedAgent } from '$lib';
-import { iter } from 'iteragain-es';
+import iter from 'iteragain-es/iter';
 import { localStorageStore } from '@skeletonlabs/skeleton';
 
 export const savedAgents = asyncable(
@@ -21,6 +21,8 @@ export const savedAgents = asyncable(
 );
 
 export const currentAgent = localStorageStore<SavedAgent | null>('currentAgentToken', null);
+console.log(get(currentAgent));
+currentAgent.subscribe((agentToken) => console.log('currentAgent changed', agentToken));
 
 export const api = new SpaceTradersAPI(
 	derived(currentAgent, (agentToken) => agentToken?.token ?? '')

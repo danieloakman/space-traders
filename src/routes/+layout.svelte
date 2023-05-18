@@ -79,7 +79,7 @@
 			<Tab bind:group={$tabSet} name="Navigation" value={'/navigation'}>
 				<svelte:fragment slot="lead"><Map /></svelte:fragment>
 			</Tab>
-			<Tab bind:group={$tabSet} name="ship" value={'/ship'}>
+			<Tab bind:group={$tabSet} name="fleet" value={'/fleet'}>
 				<svelte:fragment slot="lead"><Rocket /></svelte:fragment>
 			</Tab>
 			<!-- ... -->

@@ -92,8 +92,10 @@
 										class="btn-icon variant-filled"
 										on:click={() => {
 											savedAgents.update((agents) => agents.filter((a) => a.token !== token.token));
-										}}><Close /></button
+										}}
 									>
+										<Close />
+									</button>
 								</ListBoxItem>
 							</ListBox>
 						{/each}

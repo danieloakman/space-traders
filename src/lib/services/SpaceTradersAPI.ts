@@ -8,6 +8,8 @@ import {
 	FactionsApi,
 	SystemsApi,
 	ContractsApi,
+	DefaultApi,
+	FleetApi,
 	type Register201Response,
 	type Agent,
 	type RegisterRequestFactionEnum,
@@ -16,17 +18,24 @@ import {
 import { derived, get, writable, type Readable } from 'svelte/store';
 import { unwrapData, reloadable } from '$utils';
 import { asyncable } from 'svelte-asyncable';
-import { iter } from 'iteragain-es';
+import iter from 'iteragain-es/iter';
 
 export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
-	/** The current agent details. */
+	/** The current agent's details. */
 	readonly myAgent: Reloadable<Agent>;
+	/** The current agent's headquarters. */
 	readonly headquarters: Reloadable<Waypoint>;
+	protected readonly defaultAPI = new DefaultApi(
+		this.createConfig({ token: '' }),
+		undefined,
+		axios
+	);
 	protected readonly agentsAPI: Readable<AgentsApi>;
 	protected readonly systemsAPI: Readable<SystemsApi>;
 	protected readonly contractsAPI: Readable<ContractsApi>;
 	protected readonly factionsAPI: Readable<FactionsApi>;
+	protected readonly fleetAPI: Readable<FleetApi>;
 
 	constructor(
 		/** The agent token to use for all relevant API calls. */
@@ -45,23 +54,24 @@ export class SpaceTradersAPI {
 		this.systemsAPI = derived(this.config, this.createSystemsApi);
 		this.contractsAPI = derived(this.config, this.createContractsApi);
 		this.factionsAPI = derived(this.config, this.createFactionsApi);
+		this.fleetAPI = derived(this.config, this.createFleetApi);
 	}
 
 	async registerAgent(
 		symbol: string,
-		faction: RegisterRequestFactionEnum
+		faction: RegisterRequestFactionEnum,
+		email?: string
 	): Promise<RegisterResponse> {
-		const res: RegisterResponse = await axios
-			.post(
-				SPACE_TRADERS_URL + 'register',
-				JSON.stringify({
+		const res = await this.defaultAPI
+			.register({
+				registerRequest: {
 					symbol,
-					faction
-				})
-			)
+					faction,
+					email
+				}
+			})
 			.then(unwrapData);
-		console.log({ res });
-		await addAgentToken({ symbol, token: res.token });
+		await addAgentToken({ symbol: res.agent.symbol, token: res.token });
 		return res;
 	}
 
@@ -71,7 +81,7 @@ export class SpaceTradersAPI {
 	}
 
 	systems(limit?: number, page?: number) {
-		return get(this.systemsAPI).getSystems({ limit, page });
+		return get(this.systemsAPI).getSystems({ limit, page }).then(unwrapData);
 	}
 
 	waypoint(...args: string[]): Promise<Waypoint> {
@@ -82,7 +92,7 @@ export class SpaceTradersAPI {
 	}
 
 	contracts(limit?: number, page?: number) {
-		return get(this.contractsAPI).getContracts({ limit, page });
+		return get(this.contractsAPI).getContracts({ limit, page }).then(unwrapData);
 	}
 
 	contract(id: string) {
@@ -110,6 +120,10 @@ export class SpaceTradersAPI {
 
 	private createFactionsApi(config: Configuration) {
 		return new FactionsApi(config, undefined, axios);
+	}
+
+	private createFleetApi(config: Configuration) {
+		return new FleetApi(config, undefined, axios);
 	}
 }
 
