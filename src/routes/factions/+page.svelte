@@ -9,15 +9,5 @@
 		<span>Loading...</span>
 	{:then factions}
     <JsonView json={factions} depth={1}/>
-		<!-- <ul class="h-5">
-      {#each factions as faction}
-			<li class="h-10">
-				<a href="/contracts/{faction.symbol}" class="h-10">
-					<span class="flex-auto">{faction.name}</span>
-          <span class="flex-none">{faction.headquarters}</span>
-				</a>
-			</li>
-      {/each}
-		</ul> -->
 	{/await}
 </div>

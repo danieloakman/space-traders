@@ -4,8 +4,18 @@
 	import { page } from '$app/stores';
 	import { formatAPIResponse } from '$utils';
 	import { goto } from '$app/navigation';
+	import type { Contract } from 'spacetraders-sdk';
 
 	let depth = 1;
+
+	async function nextStep(contract: Contract) {
+		if (!contract.accepted)
+			await api.acceptContract(contract.id);
+		else if (!contract.fulfilled)
+			await api.deliverContract(contract.id);
+		else
+			await api.fulfillContract(contract.id);
+	}
 </script>
 
 {#await api.contract($page.params.id)}
@@ -33,11 +43,9 @@
 	<div class="flex justify-center my-2">
 		<button
 			class="btn-lg variant-filled-primary"
-			on:click={async () => {
-				api.acceptContract(contract.id);
-			}}
+			on:click={async () => nextStep(contract)}
 		>
-			Accept
+			{ !contract.accepted ? 'Accept': !contract.fulfilled ? 'Deliver': 'Fulfill' }
 		</button>
 	</div>
 {/await}

@@ -104,9 +104,26 @@ export class SpaceTradersAPI {
 		return get(this.contractsAPI).acceptContract({ contractId: id }).then(unwrapData);
 	}
 
+	deliverContract(id: string) {
+		// TODO: need to fill out deliverContractRequest:
+		return get(this.contractsAPI).deliverContract({ contractId: id, deliverContractRequest: {
+			shipSymbol: '',
+			tradeSymbol: '',
+			units: 0,
+		} }).then(unwrapData);
+	}
+
+	fulfillContract(id: string) {
+		return get(this.contractsAPI).fulfillContract({ contractId: id }).then(unwrapData);
+	}
+
 	// TODO: factions should also be a store.
 	factions() {
 		return get(this.factionsAPI).getFactions().then(unwrapData);
+	}
+
+	ships() {
+		return get(this.fleetAPI).getMyShips().then(unwrapData);
 	}
 
 	private createConfig(options: { token: string }) {
