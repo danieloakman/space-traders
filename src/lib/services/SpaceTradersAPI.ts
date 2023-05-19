@@ -47,17 +47,13 @@ export class SpaceTradersAPI {
 		this.contractsAPI = derived(this.config, this.createContractsApi);
 		this.factionsAPI = derived(this.config, this.createFactionsApi);
 		this.fleetAPI = derived(this.config, this.createFleetApi);
-		this.myAgent = reloadable(
-			[this.agentsAPI],
-				([agentsAPI]) => {
-					console.log('getting my agent');
-					console.log('agentsAPI', agentsAPI)
-					return agentsAPI.getMyAgent().then(unwrapData);
-				},
-		);
-		this.headquarters = reloadable(
-			[this.myAgent],
-			async ([myAgent]) => this.waypoint((await myAgent).headquarters),
+		this.myAgent = reloadable([this.agentsAPI], ([agentsAPI]) => {
+			console.log('getting my agent');
+			console.log('agentsAPI', agentsAPI);
+			return agentsAPI.getMyAgent().then(unwrapData);
+		});
+		this.headquarters = reloadable([this.myAgent], async ([myAgent]) =>
+			this.waypoint((await myAgent).headquarters)
 		);
 	}
 

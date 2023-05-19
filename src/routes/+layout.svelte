@@ -146,6 +146,12 @@
 			</div>
 		{/await}
 
+		{#await $myAgent then myAgent}
+			<div class="mx-4">
+				<JsonView json={myAgent} />
+			</div>
+		{/await}
+
 		<!-- {#await $headquarters then headquarters}
 			<div class="m-4">
 				<JsonView json={headquarters} depth={1}/>

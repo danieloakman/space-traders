@@ -6,13 +6,67 @@ import {
 	type Writable,
 	get,
 	type Subscriber,
-	type Unsubscriber
+	type Unsubscriber,
+	readable
 } from 'svelte/store';
 import { asyncable, syncable } from 'svelte-asyncable';
 import type { Identifiable, Reloadable, Stores, StoresValues } from '$types';
 import { readFile, writeFile } from '$services';
+import { noop } from 'svelte/internal';
 export { asyncable, syncable, type Asyncable };
 
+// export function toReadable<T>(fn: () => T): Readable<T> {
+// 	return {
+// 		subscribe: (run) => {
+// 			run(fn());
+// 			return noop;
+// 		}
+// 	};
+// }
+
+// export function toWritable<T>(): Writable<T> {
+
+// }
+
+function empty(): Readable<never> {
+	return {
+		subscribe: (_run) => {
+			return noop;
+		}
+	};
+}
+
+export function toStore<T>(getter: () => T): Readable<T>;
+export function toStore<T>(...args: any[]): Readable<never>;
+export function toStore<T extends Stores, U>(...args: any[]): Readable<U> | Writable<U> {
+	if (args.length === 1) {
+		const getter = args[0];
+		return {
+			subscribe: (run) => {
+				run(getter());
+				return noop;
+			}
+		} as Readable<U>;
+	} else if (args.length > 1 && args.every(arg => typeof arg === 'function')) {
+		const [getter, setter] = args;
+		return {
+			set: setter,
+			subscribe: (run) => {
+				run(getter());
+				return noop;
+			}
+		}
+	}
+
+	console.error('Invalid arguments passed to `toStore`');
+	return empty();
+	// let getter: ($stores?: T) => U;
+	// let setter: ($stores?: T, value?: U) => void | Promise<void>;
+	// let stores: T | undefined;
+	// if (args.length === 1)
+}
+
+/** @deprecated Just use normal `derived`. */
 export function asyncDerived<T extends Stores, U extends Promise<any>>(
 	stores: T,
 	fn: ($stores: StoresValues<T>) => U
@@ -25,40 +79,22 @@ export function asyncDerived<T extends Stores, U extends Promise<any>>(
 	);
 }
 
+// TODO: this doesn't cache the result for multiple subscribers.
 export function reloadable<T extends Promise<any>>(getter: () => T): Reloadable<T>;
 export function reloadable<T extends Stores, U extends Promise<any>>(
 	stores: T,
 	getter: ($stores: StoresValues<T>) => U
-): Reloadable<U>
+): Reloadable<U>;
 export function reloadable(...args: any[]): Reloadable<any> {
 	const [stores, getter] = args.length === 1 ? [[], args[0]] : args;
 
 	const reload = counter();
 	const { subscribe } = derived([...stores, reload], getter);
-	let unsub: (() => void) | undefined;
 	return {
 		subscribe,
 		reload: () => reload.inc(),
-		get: () => new Promise(resolve => {
-			unsub = subscribe(value => {
-				if (unsub) {
-					unsub();
-					unsub = undefined;
-				}
-				resolve(value);
-			})
-		})
-	}
-
-	// const result = asyncDerived(
-	// 	getter,
-	// 	undefined,
-	// 	// @ts-ignore
-	// 	[...stores, reload]
-	// );
-	// return Object.assign(result, {
-	// 	reload: () => reload.inc()
-	// })
+		get: () => new Promise((resolve) => subscribe(resolve)())
+	};
 }
 
 /**
@@ -69,6 +105,11 @@ export function counter(start = 0) {
 	const { subscribe, update } = writable<number>(start);
 	return {
 		inc: () => update((n) => n + 1),
+		dec: () => update((n) => n - 1),
+		reset : () => update(() => start),
+		get get() {
+			return get({ subscribe });
+		},
 		subscribe
 	};
 }
