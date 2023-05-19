@@ -76,14 +76,14 @@ describe('stores-utils.ts', () => {
 			expect(get(c)).toBe(2);
 
 			// Subscribing causes the asyncable to cache it's value:
-			c = counter();
+			c.reset();
 			let unsub = s1.subscribe(() => {});
 			await s1.get();
 			await s1.get();
 			unsub();
 			expect(get(c)).toBe(1);
 
-			c = counter();
+			c.reset();
 			const s2 = reloadable(() => {
 				c.inc();
 				return sleep(50);
@@ -93,16 +93,19 @@ describe('stores-utils.ts', () => {
 			await s2.get();
 			expect(get(c)).toBe(2);
 
-			c = counter();
+			c.reset();
 			unsub = s2.subscribe(() => {});
+			const unsub2 = s2.subscribe(() => {});
 			s2.reload();
 			s2.reload();
 			s2.reload();
 			expect(get(c)).toBe(4);
-			c = counter();
-			await get(s2);
-			await get(s2);
+			c.reset();
+			expect(await get(s2)).toBe(50);
+			expect(await s2.get()).toBe(50);
 			expect(get(c)).toBe(0);
+			unsub();
+			unsub2();
 
 		},
 		{ timeout: 60000 }

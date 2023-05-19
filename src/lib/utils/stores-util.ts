@@ -79,17 +79,32 @@ export function asyncDerived<T extends Stores, U extends Promise<any>>(
 	);
 }
 
-// TODO: this doesn't cache the result for multiple subscribers.
 export function reloadable<T extends Promise<any>>(getter: () => T): Reloadable<T>;
 export function reloadable<T extends Stores, U extends Promise<any>>(
 	stores: T,
-	getter: ($stores: StoresValues<T>) => U
+	getter: ($stores: StoresValues<T>) => U,
 ): Reloadable<U>;
 export function reloadable(...args: any[]): Reloadable<any> {
 	const [stores, getter] = args.length === 1 ? [[], args[0]] : args;
 
 	const reload = counter();
-	const { subscribe } = derived([...stores, reload], getter);
+
+	// Setup the initial value;
+	let resolve: (value: any) => void;
+	const initial = new Promise((res) => (resolve = res));
+
+	const derived$ = derived([...stores, reload], (values) => values.slice(0, -1));
+
+	const { subscribe } = writable(initial, (set) => {
+		return derived$.subscribe(async (values = []) => {
+			let value = getter(values);
+			if (value === undefined) return;
+			value = Promise.resolve(value);
+			set(value);
+			resolve(value);
+		});
+	});
+
 	return {
 		subscribe,
 		reload: () => reload.inc(),

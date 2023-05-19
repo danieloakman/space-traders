@@ -23,8 +23,8 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { Drawer, drawerStore } from '@skeletonlabs/skeleton';
-	import { api } from '$stores';
 	import { JsonView } from '@zerodevx/svelte-json-view';
+	import { sleep, api } from '$lib';
 
 	const isDrawerOpen = derived(drawerStore, ($drawer) => $drawer.open ?? false);
 
@@ -146,16 +146,18 @@
 			</div>
 		{/await}
 
-		{#await $myAgent then myAgent}
-			<div class="mx-4">
-				<JsonView json={myAgent} />
-			</div>
-		{/await}
+		<!-- {#await sleep(1000) then _}
+			{#await $myAgent then myAgent}
+				<div class="mx-4">
+					<JsonView json={myAgent} />
+				</div>
+			{/await}
+		{/await} -->
 
-		<!-- {#await $headquarters then headquarters}
+		{#await $headquarters then headquarters}
 			<div class="m-4">
 				<JsonView json={headquarters} depth={1}/>
 			</div>
-		{/await} -->
+		{/await}
 	{/if}
 </Drawer>
