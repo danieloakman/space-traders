@@ -15,6 +15,6 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
 	define: {
-		'import.meta.vitest': undefined,
+		'import.meta.vitest': undefined
 	}
 });
