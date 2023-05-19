@@ -1,4 +1,4 @@
-import type { AsyncValue, Asyncable } from 'svelte-asyncable';
+import type { Asyncable } from 'svelte-asyncable';
 import {
 	writable,
 	type Readable,
@@ -9,48 +9,67 @@ import {
 	type Unsubscriber
 } from 'svelte/store';
 import { asyncable, syncable } from 'svelte-asyncable';
-import type { Identifiable, Reloadable } from '$types';
+import type { Identifiable, Reloadable, Stores, StoresValues } from '$types';
 import { readFile, writeFile } from '$services';
+export { asyncable, syncable, type Asyncable };
 
-/**
- * Wraps an Asyncable store with an additional method called `reload`. Which when called will call `source`'s
- * getter.
- */
-export function reloadable<T>(
-	source: Asyncable<T>,
-	options: { readonly?: boolean } = {}
-): Reloadable<T> {
-	const reload = counter();
-	const setter = options.readonly ? undefined : (value: T) => source.set(value);
-	const wrapped = asyncable(
-		async ($source: AsyncValue<T>) => {
-			const result = await $source;
-			return result;
-		},
-		setter,
-		[source, reload]
+export function asyncDerived<T extends Stores, U extends Promise<any>>(
+	stores: T,
+	fn: ($stores: StoresValues<T>) => U
+): Asyncable<Awaited<U>> {
+	return asyncable(
+		(...stores: StoresValues<T>) => fn(stores),
+		undefined,
+		// @ts-ignore
+		stores
 	);
-	return Object.assign(wrapped, {
-		reload() {
-			reload.update((n) => n + 1);
-		}
-	});
+}
+
+export function reloadable<T extends Promise<any>>(getter: () => T): Reloadable<T>;
+export function reloadable<T extends Stores, U extends Promise<any>>(
+	stores: T,
+	getter: ($stores: StoresValues<T>) => U
+): Reloadable<U>
+export function reloadable(...args: any[]): Reloadable<any> {
+	const [stores, getter] = args.length === 1 ? [[], args[0]] : args;
+
+	const reload = counter();
+	const { subscribe } = derived([...stores, reload], getter);
+	let unsub: (() => void) | undefined;
+	return {
+		subscribe,
+		reload: () => reload.inc(),
+		get: () => new Promise(resolve => {
+			unsub = subscribe(value => {
+				if (unsub) {
+					unsub();
+					unsub = undefined;
+				}
+				resolve(value);
+			})
+		})
+	}
+
+	// const result = asyncDerived(
+	// 	getter,
+	// 	undefined,
+	// 	// @ts-ignore
+	// 	[...stores, reload]
+	// );
+	// return Object.assign(result, {
+	// 	reload: () => reload.inc()
+	// })
 }
 
 /**
  * Provides a writable that isn't actually "writable". Every time `set` or `update` is called it increments
  * the internal integer. Can be used as an easy way to trigger a reload for example.
  */
-export function counter(start = 0): Writable<number> {
-	const store = writable<number>(start);
+export function counter(start = 0) {
+	const { subscribe, update } = writable<number>(start);
 	return {
-		subscribe: store.subscribe,
-		set: () => {
-			store.set(get(store) + 1);
-		},
-		update() {
-			store.update((n) => ++n);
-		}
+		inc: () => update((n) => n + 1),
+		subscribe
 	};
 }
 
@@ -61,10 +80,10 @@ export function toAsyncable<T>(
 	options: { readonly?: boolean } = {}
 ) {
 	const setter = !options.readonly && 'set' in source ? (value: T) => source.set(value) : undefined;
-	return asyncable(async ($source: AsyncValue<T>) => $source, setter, [source]);
+	return asyncable(async ($source: Promise<T>) => $source, setter, [source]);
 }
 
-export class EntityStore<T extends Identifiable> implements Readable<AsyncValue<T[]>> {
+export class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 	// TODO: Could maybe make this class more efficient by using a map<ID, array index>.
 	// Also, there's no internal ID checking against values already in the store.
 	constructor(protected source: Asyncable<T[]>) {}
@@ -83,7 +102,7 @@ export class EntityStore<T extends Identifiable> implements Readable<AsyncValue<
 
 	select(id: string): Asyncable<T | undefined> {
 		return asyncable(
-			async ($source: AsyncValue<T[]>) => (await $source).find((e) => e.id === id),
+			async ($source: Promise<T[]>) => (await $source).find((e) => e.id === id),
 			(value: T) => this.update(id, () => value),
 			[this.source]
 		);

@@ -16,45 +16,49 @@ import {
 	type Waypoint
 } from 'spacetraders-sdk';
 import { derived, get, writable, type Readable } from 'svelte/store';
-import { unwrapData, reloadable } from '$utils';
+import { unwrapData, reloadable, fastHash } from '$utils';
 import { asyncable } from 'svelte-asyncable';
-import iter from 'iteragain-es/iter';
+import iter from 'iteragain/iter';
 
 export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
-	/** The current agent's details. */
-	readonly myAgent: Reloadable<Agent>;
-	/** The current agent's headquarters. */
-	readonly headquarters: Reloadable<Waypoint>;
-	protected readonly defaultAPI = new DefaultApi(
-		this.createConfig({ token: '' }),
-		undefined,
-		axios
-	);
 	protected readonly agentsAPI: Readable<AgentsApi>;
 	protected readonly systemsAPI: Readable<SystemsApi>;
 	protected readonly contractsAPI: Readable<ContractsApi>;
 	protected readonly factionsAPI: Readable<FactionsApi>;
 	protected readonly fleetAPI: Readable<FleetApi>;
+	/** The current agent's details. */
+	readonly myAgent: Reloadable<Promise<Agent>>;
+	/** The current agent's headquarters. */
+	readonly headquarters: Reloadable<Promise<Waypoint>>;
+	protected readonly defaultAPI = new DefaultApi(
+		this.createConfig({ token: '' }),
+		undefined,
+		axios
+	);
 
 	constructor(
 		/** The agent token to use for all relevant API calls. */
 		protected readonly agentToken: Readable<string>
 	) {
 		this.config = derived(this.agentToken, (token) => this.createConfig({ token }));
-		this.myAgent = reloadable(
-			asyncable(() => get(this.agentsAPI).getMyAgent().then(unwrapData)),
-			{ readonly: true }
-		);
-		this.headquarters = reloadable(
-			asyncable(() => this.myAgent.get().then((agent) => this.waypoint(agent.headquarters))),
-			{ readonly: true }
-		);
 		this.agentsAPI = derived(this.config, this.createAgentsApi);
 		this.systemsAPI = derived(this.config, this.createSystemsApi);
 		this.contractsAPI = derived(this.config, this.createContractsApi);
 		this.factionsAPI = derived(this.config, this.createFactionsApi);
 		this.fleetAPI = derived(this.config, this.createFleetApi);
+		this.myAgent = reloadable(
+			[this.agentsAPI],
+				([agentsAPI]) => {
+					console.log('getting my agent');
+					console.log('agentsAPI', agentsAPI)
+					return agentsAPI.getMyAgent().then(unwrapData);
+				},
+		);
+		this.headquarters = reloadable(
+			[this.myAgent],
+			async ([myAgent]) => this.waypoint((await myAgent).headquarters),
+		);
 	}
 
 	async registerAgent(

@@ -1,7 +1,7 @@
 import type { DataObject, UnwrapData } from '$types';
 
-export function sleep(ms: number): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+export function sleep(ms: number): Promise<number> {
+	return new Promise((resolve) => setTimeout(() => resolve(ms), ms));
 }
 
 export function iife<T extends () => any>(fn: T): ReturnType<T> {

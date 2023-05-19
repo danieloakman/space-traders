@@ -37,6 +37,7 @@
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.0.1",
 		"tailwindcss": "^3.3.2",
+		"ts-node": "^10.9.1",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"unplugin-icons": "^0.16.1",
@@ -50,7 +51,7 @@
 		"@capacitor/filesystem": "^5.0.2",
 		"@zerodevx/svelte-json-view": "^1.0.5",
 		"axios": "^1.4.0",
-		"iteragain-es": "^3.16.1",
+		"iteragain": "^3.16.1",
 		"spacetraders-sdk": "file:packages/spacetraders-sdk-2.0.0.tgz",
 		"svelte-asyncable": "^2.1.1"
 	}

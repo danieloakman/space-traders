@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ListBox, ListBoxItem, Tab, TabGroup } from '@skeletonlabs/skeleton';
-	import { savedAgents, api, currentAgent } from '$stores';
+	import { savedAgents, api, currentToken } from '$stores';
 	// import { agentDetails } from '$services';
 	import { get, writable } from 'svelte/store';
 	import type { RegisterRequestFactionEnum } from 'spacetraders-sdk';
@@ -13,23 +13,7 @@
 		faction: 'COSMIC' as RegisterRequestFactionEnum
 	};
 	let newToken = '';
-	let selectedAgent: SavedAgent = { id: '', symbol: '', token: '' };
 	let tabSet = 0;
-
-
-	$: if (selectedAgent.token.length) {
-		savedAgents.get().then((agents) => console.log({ agents }));
-		currentAgent.set(selectedAgent);
-		// api.myAgent.reload();
-		console.time('myAgent');
-		api.myAgent.get().then((myAgent) => {
-			console.log({ myAgent });
-			console.timeEnd('myAgent');
-		});
-		// api.headquarters.get().then((headquarters) => {
-		// 	console.log({ headquarters });
-		// });
-	}
 </script>
 
 <TabGroup justify="justify-center">
@@ -92,18 +76,23 @@
 			{:then agents}
 				{#if agents.length > 0}
 					<div class="card p-4 m-4">
-						{#each agents as token}
-							<ListBox>
-								<ListBoxItem bind:group={selectedAgent} name="medium" value={token}>
+						{#each agents as agent}
+							<ListBox default={get(currentToken)}>
+								<ListBoxItem
+									class="flex w-100"
+									bind:group={$currentToken}
+									name="medium"
+									value={agent.token}
+								>
 									<span>
-										{token.symbol}
+										{agent.symbol}
 										<!-- {token.faction} -->
 									</span>
 									<button
 										type="button"
-										class="btn-icon variant-filled"
+										class="btn-icon variant-filled-error me-auto"
 										on:click={() => {
-											savedAgents.delete(token.id);
+											savedAgents.delete(agent.id);
 										}}
 									>
 										<Close />

@@ -23,13 +23,13 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { Drawer, drawerStore } from '@skeletonlabs/skeleton';
-	// import type { DrawerSettings } from '@skeletonlabs/skeleton';
 	import { api } from '$stores';
 	import { JsonView } from '@zerodevx/svelte-json-view';
 
 	const isDrawerOpen = derived(drawerStore, ($drawer) => $drawer.open ?? false);
 
 	const myAgent = api.myAgent;
+	const headquarters = api.headquarters;
 
 	const tabSet = writable('/');
 	tabSet.subscribe((value) => {
@@ -133,16 +133,23 @@
 	bgBackdrop="bg-gradient-to-tr from-blue-500/50 via-purple-500/50 to-red-500/50"
 >
 	{#if $isDrawerOpen}
-		{#await $myAgent then agent}
-			<div class="m-4 flex justify-between">
-				<button />
-				<button class="btn-icon variant-filled-primary" on:click={() => myAgent.reload()}
-					><Refresh /></button
-				>
-			</div>
-			<div class="m-4">
-				<JsonView json={agent} />
+		<div class="m-4 flex justify-between">
+			<button />
+			<button class="btn-icon variant-filled-primary" on:click={() => myAgent.reload()}>
+				<Refresh />
+			</button>
+		</div>
+
+		{#await $myAgent then myAgent}
+			<div class="mx-4">
+				<JsonView json={myAgent} />
 			</div>
 		{/await}
+
+		<!-- {#await $headquarters then headquarters}
+			<div class="m-4">
+				<JsonView json={headquarters} depth={1}/>
+			</div>
+		{/await} -->
 	{/if}
 </Drawer>

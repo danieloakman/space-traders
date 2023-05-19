@@ -1,8 +1,10 @@
 import type { Agent, Contract, Faction, GetMyAgent200Response, Ship } from 'spacetraders-sdk';
 import type { Asyncable } from 'svelte-asyncable';
+import type { Readable } from 'svelte/store';
 
-export interface Reloadable<T> extends Asyncable<T> {
+export interface Reloadable<T> extends Readable<T> {
 	reload(): void;
+	get(): T;
 }
 
 export interface SavedAgent extends Identifiable {
@@ -38,3 +40,16 @@ export interface FullWaypoint {
 	system: string;
 	waypoint: string;
 }
+
+/** One or more `Readable`s. Use this over the svelte-asyncable package's types */
+export type Stores =
+	| Readable<any>
+	| [Readable<any>, ...Array<Readable<any>>]
+	| Array<Readable<any>>;
+
+/** One or more values from `Readable` stores. Use this over the svelte-asyncable package's types */
+export type StoresValues<T> = T extends Readable<infer U>
+	? U
+	: {
+			[K in keyof T]: T[K] extends Readable<infer U> ? U : never;
+	  };
