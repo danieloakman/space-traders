@@ -1,28 +1,59 @@
-import { Directory } from '@capacitor/filesystem';
-import { writable, readable, derived, get } from 'svelte/store';
-import type { Readable, Subscriber, Unsubscriber, Updater, Writable } from 'svelte/store';
-import { asyncable, type Asyncable, syncable } from 'svelte-asyncable';
-import { SpaceTradersAPI, getAgentTokens, setAgentTokens } from '$services';
-import type { SavedAgent } from '$lib';
+import { derived, get } from 'svelte/store';
+import { asyncable } from 'svelte-asyncable';
+import { SpaceTradersAPI, readFile, writeFile, AGENT_TOKENS_PATH, entityStore, type SavedAgent, fileStore } from '$lib';
 import iter from 'iteragain-es/iter';
 import { localStorageStore } from '@skeletonlabs/skeleton';
 
-export const savedAgents = asyncable(
-	getAgentTokens,
-	async ($newValue: SavedAgent[], $prevValue: SavedAgent[]) => {
-		console.log('agentTokens changed', $newValue, $prevValue);
-		await setAgentTokens(
-			iter($newValue)
-				.concat($prevValue)
-				.unique({ iteratee: (agentToken) => agentToken.token })
-				.toArray()
-		);
-	}
-);
+// export async function getAgentTokens() {
+// 	try {
+// 		const file = await fs.readFile({
+// 			path: AGENT_TOKENS_PATH,
+// 			directory: Directory.Data,
+// 			encoding: Encoding.UTF8
+// 		});
+// 		return JSON.parse(file.data) as SavedAgent[];
+// 	} catch (e: any) {
+// 		console.error(e);
+// 		return [];
+// 	}
+// }
+
+// export async function setAgentTokens(agentTokens: SavedAgent[]) {
+// 	try {
+// 		await fs.mkdir({
+// 			path: AGENT_TOKENS_PATH.split('/').slice(0, -1).join('/'),
+// 			recursive: true
+// 		});
+// 		await fs.writeFile({
+// 			path: AGENT_TOKENS_PATH,
+// 			directory: Directory.Data,
+// 			data: JSON.stringify(agentTokens),
+// 			encoding: Encoding.UTF8
+// 		});
+// 	} catch (e: any) {
+// 		console.error(e.message);
+// 	}
+// }
+
+export const savedAgents = entityStore(fileStore<SavedAgent[]>(AGENT_TOKENS_PATH, []));
+
+// export const savedAgents = entityStore(asyncable(
+// 	async () => {
+// 		return (await readFile<SavedAgent[]>(AGENT_TOKENS_PATH)) ?? [];
+// 	},
+// 	async ($newValue: SavedAgent[], $prevValue: SavedAgent[]) => {
+// 		await writeFile(AGENT_TOKENS_PATH, JSON.stringify($newValue);
+// 		// console.log('agentTokens changed', $newValue, $prevValue);
+// 		// await setAgentTokens(
+// 		// 	iter($newValue)
+// 		// 		.concat($prevValue)
+// 		// 		.unique({ iteratee: (agentToken) => agentToken.token })
+// 		// 		.toArray()
+// 		// );
+// 	}
+// ));
 
 export const currentAgent = localStorageStore<SavedAgent | null>('currentAgentToken', null);
-console.log(get(currentAgent));
-currentAgent.subscribe((agentToken) => console.log('currentAgent changed', agentToken));
 
 export const api = new SpaceTradersAPI(
 	derived(currentAgent, (agentToken) => agentToken?.token ?? '')

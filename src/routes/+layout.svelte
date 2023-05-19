@@ -8,7 +8,17 @@
 
 	import { AppShell, AppBar, TabGroup, Tab } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
-	import { Home, ReceiptLong, Rocket, Map, ChevronLeft, Menu, MenuOpen, Refresh, Groups } from '$icons';
+	import {
+		Home,
+		ReceiptLong,
+		Rocket,
+		Map,
+		ChevronLeft,
+		Menu,
+		MenuOpen,
+		Refresh,
+		Groups
+	} from '$icons';
 	import { derived, get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -125,8 +135,10 @@
 	{#if $isDrawerOpen}
 		{#await $myAgent then agent}
 			<div class="m-4 flex justify-between">
-				<button></button>
-				<button class="btn-icon variant-filled-primary" on:click={() => myAgent.reload()}><Refresh/></button>
+				<button />
+				<button class="btn-icon variant-filled-primary" on:click={() => myAgent.reload()}
+					><Refresh /></button
+				>
 			</div>
 			<div class="m-4">
 				<JsonView json={agent} />

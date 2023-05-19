@@ -6,28 +6,29 @@
 	import type { RegisterRequestFactionEnum } from 'spacetraders-sdk';
 	import type { SavedAgent } from '$types';
 	import { Close } from '$icons';
+	import { fastHash } from '$utils';
 
 	const agent = {
 		symbol: '',
 		faction: 'COSMIC' as RegisterRequestFactionEnum
 	};
 	let newToken = '';
-	let selectedAgent: SavedAgent = { symbol: '', token: '' };
+	let selectedAgent: SavedAgent = { id: '', symbol: '', token: '' };
 	let tabSet = 0;
 
-	console.log(get(currentAgent));
 
 	$: if (selectedAgent.token.length) {
-		currentAgent.update(() => selectedAgent);
+		savedAgents.get().then((agents) => console.log({ agents }));
+		currentAgent.set(selectedAgent);
 		// api.myAgent.reload();
 		console.time('myAgent');
 		api.myAgent.get().then((myAgent) => {
 			console.log({ myAgent });
 			console.timeEnd('myAgent');
 		});
-		api.headquarters.get().then((headquarters) => {
-			console.log({ headquarters });
-		});
+		// api.headquarters.get().then((headquarters) => {
+		// 	console.log({ headquarters });
+		// });
 	}
 </script>
 
@@ -55,6 +56,11 @@
 					class="btn variant-filled"
 					on:click={async () => {
 						const result = await api.registerAgent(agent.symbol, agent.faction);
+						savedAgents.create({
+							id: fastHash(JSON.stringify(result)).toString(),
+							symbol: result.agent.symbol,
+							token: result.token
+						});
 					}}>Submit</button
 				>
 			</div>
@@ -71,16 +77,22 @@
 					on:click={async () => {
 						const result = await api.agent(newToken);
 						console.log(result);
-						savedAgents.set([{ symbol: result.symbol, token: newToken }]);
-					}}>Submit</button
+						savedAgents.create({
+							id: fastHash(JSON.stringify(result)).toString(),
+							symbol: result.symbol,
+							token: newToken
+						});
+					}}
 				>
+					Submit
+				</button>
 			</div>
 			{#await $savedAgents}
 				<p>Loading...</p>
-			{:then tokens}
-				{#if tokens.length > 0}
+			{:then agents}
+				{#if agents.length > 0}
 					<div class="card p-4 m-4">
-						{#each tokens as token}
+						{#each agents as token}
 							<ListBox>
 								<ListBoxItem bind:group={selectedAgent} name="medium" value={token}>
 									<span>
@@ -91,7 +103,7 @@
 										type="button"
 										class="btn-icon variant-filled"
 										on:click={() => {
-											savedAgents.update((agents) => agents.filter((a) => a.token !== token.token));
+											savedAgents.delete(token.id);
 										}}
 									>
 										<Close />

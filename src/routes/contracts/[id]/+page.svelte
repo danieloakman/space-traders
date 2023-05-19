@@ -9,12 +9,9 @@
 	let depth = 1;
 
 	async function nextStep(contract: Contract) {
-		if (!contract.accepted)
-			await api.acceptContract(contract.id);
-		else if (!contract.fulfilled)
-			await api.deliverContract(contract.id);
-		else
-			await api.fulfillContract(contract.id);
+		if (!contract.accepted) await api.acceptContract(contract.id);
+		else if (!contract.fulfilled) await api.deliverContract(contract.id);
+		else await api.fulfillContract(contract.id);
 	}
 </script>
 
@@ -41,11 +38,8 @@
 	</div>
 
 	<div class="flex justify-center my-2">
-		<button
-			class="btn-lg variant-filled-primary"
-			on:click={async () => nextStep(contract)}
-		>
-			{ !contract.accepted ? 'Accept': !contract.fulfilled ? 'Deliver': 'Fulfill' }
+		<button class="btn-lg variant-filled-primary" on:click={async () => nextStep(contract)}>
+			{!contract.accepted ? 'Accept' : !contract.fulfilled ? 'Deliver' : 'Fulfill'}
 		</button>
 	</div>
 {/await}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { api } from '$stores';
+	import { api } from '$stores';
 	import { JsonView } from '@zerodevx/svelte-json-view';
 </script>
 
@@ -8,6 +8,6 @@
 	{#await api.factions()}
 		<span>Loading...</span>
 	{:then factions}
-    <JsonView json={factions} depth={1}/>
+		<JsonView json={factions} depth={1} />
 	{/await}
 </div>

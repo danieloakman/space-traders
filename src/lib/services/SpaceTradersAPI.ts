@@ -1,6 +1,6 @@
 import type { SavedAgent, RegisterResponse, FullWaypoint, Reloadable } from '$lib/types';
 import { AGENT_TOKENS_PATH, SECRETS_DIR, SPACE_TRADERS_URL } from '../constants';
-import { Directory, Filesystem, Encoding } from '@capacitor/filesystem';
+import { Directory, Filesystem as fs, Encoding } from '@capacitor/filesystem';
 import axios from './axios-instance';
 import {
 	AgentsApi,
@@ -71,7 +71,6 @@ export class SpaceTradersAPI {
 				}
 			})
 			.then(unwrapData);
-		await addAgentToken({ symbol: res.agent.symbol, token: res.token });
 		return res;
 	}
 
@@ -106,11 +105,16 @@ export class SpaceTradersAPI {
 
 	deliverContract(id: string) {
 		// TODO: need to fill out deliverContractRequest:
-		return get(this.contractsAPI).deliverContract({ contractId: id, deliverContractRequest: {
-			shipSymbol: '',
-			tradeSymbol: '',
-			units: 0,
-		} }).then(unwrapData);
+		return get(this.contractsAPI)
+			.deliverContract({
+				contractId: id,
+				deliverContractRequest: {
+					shipSymbol: '',
+					tradeSymbol: '',
+					units: 0
+				}
+			})
+			.then(unwrapData);
 	}
 
 	fulfillContract(id: string) {
@@ -168,32 +172,3 @@ export function fullWaypoint(...args: string[]): FullWaypoint {
 export const DEFAULT_HEADERS = {
 	'Content-Type': 'application/json'
 };
-
-export async function getAgentTokens() {
-	try {
-		const file = await Filesystem.readFile({
-			path: AGENT_TOKENS_PATH,
-			directory: Directory.Data,
-			encoding: Encoding.UTF8
-		});
-		return JSON.parse(file.data) as SavedAgent[];
-	} catch (e: any) {
-		console.error(e);
-		return [];
-	}
-}
-
-export async function setAgentTokens(agentTokens: SavedAgent[]) {
-	await Filesystem.writeFile({
-		path: AGENT_TOKENS_PATH,
-		directory: Directory.Data,
-		data: JSON.stringify(agentTokens),
-		encoding: Encoding.UTF8
-	});
-}
-
-export async function addAgentToken(agentToken: SavedAgent) {
-	const agentTokens = await getAgentTokens();
-	agentTokens.push(agentToken);
-	await setAgentTokens(agentTokens);
-}

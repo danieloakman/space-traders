@@ -38,6 +38,6 @@ export {
 	Menu,
 	MenuOpen,
 	Refresh,
-	Groups,
+	Groups
 };
 // export * as MaterialIcons from 'virtual:icons/material-symbols';

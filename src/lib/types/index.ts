@@ -5,7 +5,7 @@ export interface Reloadable<T> extends Asyncable<T> {
 	reload(): void;
 }
 
-export interface SavedAgent {
+export interface SavedAgent extends Identifiable {
 	symbol: string;
 	// faction: string;
 	token: string;
