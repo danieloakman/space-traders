@@ -120,7 +120,13 @@ export function asyncable<T>(...args: any[]) {
 		source.set(value)
 		return value;
 	} : undefined;
-	return asyncable(source, () => get(source), setter as any);
+	return {
+		subscribe: source.subscribe,
+		get: () => get(source),
+		set: setter,
+		update: (fn: (value: T) => T) => source.update(fn)
+	}
+	// return asyncable(source, () => get(source), setter as any);
 	// return _asyncable(async ($source: Promise<T>) => $source, setter, [source]);
 }
 
