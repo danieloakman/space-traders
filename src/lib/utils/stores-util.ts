@@ -92,11 +92,11 @@ export function asyncable<T extends Stores, U>(
 		oldValue?: SafeAwaitDepth1<U>
 	) => U | Promise<U> | void | Promise<void>
 ): Asyncable<SafeAwaitDepth1<U>>;
-export function asyncable<T>(source: Readable<T>): Asyncable<SafeAwaitDepth1<T>>;
 export function asyncable<T>(
 	source: Writable<T>,
 	options?: { readonly?: boolean }
 ): Asyncable<SafeAwaitDepth1<T>>;
+export function asyncable<T>(source: Readable<T>): Asyncable<SafeAwaitDepth1<T>>;
 export function asyncable<T>(...args: any[]) {
 	if (typeof args[0] === 'function') {
 		const [getter, setter] = args;
@@ -116,8 +116,12 @@ export function asyncable<T>(...args: any[]) {
 
 	// Handle cases where Readables or Writables and options are passed:
 	const [source, options = {}] = args;
-	const setter = !options.readonly && 'set' in source ? (value: T) => source.set(value) : undefined;
-	return _asyncable(async ($source: Promise<T>) => $source, setter, [source]);
+	const setter = !options.readonly && 'set' in source ? (value: T) => {
+		source.set(value)
+		return value;
+	} : undefined;
+	return asyncable(source, () => get(source), setter as any);
+	// return _asyncable(async ($source: Promise<T>) => $source, setter, [source]);
 }
 
 class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
@@ -137,13 +141,17 @@ class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 		return entities;
 	}
 
-	// select(id: string): Asyncable<T | undefined> {
-	// 	return asyncable(
-	// 		this.source
-	// 		async ($source) => (await $source).find((e) => e.id === id),
-	// 		(value: T) => this.update(id, () => value),
-	// 	);
-	// }
+	select(id: string): Asyncable<T | undefined> {
+		return asyncable(
+			this.source,
+			async ($source) => {
+				return (await $source).find((e) => e.id === id)
+			},
+			(value) => {
+				if (value) this.update(id, () => value)
+			},
+		);
+	}
 
 	set(...values: (Partial<T> & Identifiable)[]) {
 		this.source.update((entities) => {

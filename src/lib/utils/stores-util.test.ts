@@ -139,6 +139,10 @@ describe('stores-utils.ts', () => {
 
 		const d2 = asyncable([s1, d], async ([$s1, $d]) => (await $d) + (await $s1));
 		expect(await d2.get()).toBe(101);
+
+		const w = asyncable(writable(5));
+		w.update(n => n + 1);
+		expect(await w.get()).toBe(6);
 	});
 
 	// Doesn't work in node, must be in browser:
@@ -149,6 +153,9 @@ describe('stores-utils.ts', () => {
 	// });
 
 	it('entityStore', async () => {
-		// const store = entityStore(wri('test', []));
+		const store = entityStore(asyncable(writable<{ id: string, name: string }[]>([])));
+		store.create({ id: '1', name: 'test' });
+		const entity = store.select('1')
+		expect(await entity.get()).toStrictEqual({ id: '1', name: 'test' });
 	});
 });
