@@ -44,24 +44,26 @@ describe('stores-utils.ts', () => {
 				Promise.all([s1, s2]).then(([n, s]) => n + s)
 			).get()
 		).toBe('5075');
+	});
 
-		const s4 = toStore(() => {
+	it('toStore', async () => {
+		const s1 = toStore(() => {
 			// console.log('s4');
 			return sleep(50)
 		});
-		const s5 = toStore(() => {
+		const s2 = toStore(() => {
 			// console.log('s5');
 			return sleep(75).then((n) => n.toString())
 		});
-		const s6 = derived([s4, s5], async ([a, b]) => {
+		const s3 = derived([s1, s2], async ([a, b]) => {
 			const resultA = await a;
 			const resultB = await b;
 			return resultA + resultB;
 		});
 
-		await get(s6);
-		expect(await get(s6)).toBe('5075');
-	});
+		await get(s3);
+		expect(await get(s3)).toBe('5075');
+	})
 
 	it(
 		'reloadable',
@@ -110,4 +112,8 @@ describe('stores-utils.ts', () => {
 		},
 		{ timeout: 60000 }
 	);
+
+	it('fileStore', async () => {
+
+	});
 });

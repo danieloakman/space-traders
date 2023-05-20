@@ -1,4 +1,3 @@
-import type { Asyncable } from 'svelte-asyncable';
 import {
 	writable,
 	type Readable,
@@ -9,24 +8,10 @@ import {
 	type Unsubscriber,
 	readable
 } from 'svelte/store';
-import { asyncable, syncable } from 'svelte-asyncable';
+import { asyncable, type Asyncable } from 'svelte-asyncable';
 import type { Identifiable, Reloadable, Stores, StoresValues } from '$types';
 import { readFile, writeFile } from '$services';
 import { noop } from 'svelte/internal';
-export { asyncable, syncable, type Asyncable };
-
-// export function toReadable<T>(fn: () => T): Readable<T> {
-// 	return {
-// 		subscribe: (run) => {
-// 			run(fn());
-// 			return noop;
-// 		}
-// 	};
-// }
-
-// export function toWritable<T>(): Writable<T> {
-
-// }
 
 function empty(): Readable<never> {
 	return {
@@ -60,10 +45,6 @@ export function toStore<T extends Stores, U>(...args: any[]): Readable<U> | Writ
 
 	console.error('Invalid arguments passed to `toStore`');
 	return empty();
-	// let getter: ($stores?: T) => U;
-	// let setter: ($stores?: T, value?: U) => void | Promise<void>;
-	// let stores: T | undefined;
-	// if (args.length === 1)
 }
 
 /** @deprecated Just use normal `derived`. */
@@ -129,6 +110,7 @@ export function counter(start = 0) {
 	};
 }
 
+/** @deprecated Shouldn't convert things to Asyncable, just use a regular store that contains a promise. */
 export function toAsyncable<T>(source: Readable<T>): Asyncable<T>;
 export function toAsyncable<T>(source: Writable<T>, options?: { readonly?: boolean }): Asyncable<T>;
 export function toAsyncable<T>(

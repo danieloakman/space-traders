@@ -1,6 +1,5 @@
-import type { SavedAgent, RegisterResponse, FullWaypoint, Reloadable } from '$lib/types';
-import { AGENT_TOKENS_PATH, SECRETS_DIR, SPACE_TRADERS_URL } from '../constants';
-import { Directory, Filesystem as fs, Encoding } from '@capacitor/filesystem';
+import type { RegisterResponse, FullWaypoint, Reloadable } from '$lib/types';
+import { SPACE_TRADERS_URL } from '../constants';
 import axios from './axios-instance';
 import {
 	AgentsApi,
@@ -15,9 +14,8 @@ import {
 	type RegisterRequestFactionEnum,
 	type Waypoint
 } from 'spacetraders-sdk';
-import { derived, get, writable, type Readable } from 'svelte/store';
-import { unwrapData, reloadable, fastHash } from '$utils';
-import { asyncable } from 'svelte-asyncable';
+import { derived, get, type Readable } from 'svelte/store';
+import { unwrapData, reloadable } from '$utils';
 import iter from 'iteragain/iter';
 
 export class SpaceTradersAPI {

@@ -1,5 +1,4 @@
 import type { Agent, Contract, Faction, GetMyAgent200Response, Ship } from 'spacetraders-sdk';
-import type { Asyncable } from 'svelte-asyncable';
 import type { Readable } from 'svelte/store';
 
 export interface Reloadable<T> extends Readable<T> {
