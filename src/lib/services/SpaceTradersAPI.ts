@@ -9,7 +9,6 @@ import {
 	ContractsApi,
 	DefaultApi,
 	FleetApi,
-	type Register201Response,
 	type Agent,
 	type RegisterRequestFactionEnum,
 	type Waypoint

@@ -8,12 +8,14 @@ import {
 	type Unsubscriber,
 	readable
 } from 'svelte/store';
-import { asyncable, type Asyncable } from 'svelte-asyncable';
-import type { Identifiable, Reloadable, Stores, StoresValues } from '$types';
+import { asyncable as _asyncable, type Asyncable } from 'svelte-asyncable';
+import type { Identifiable, Reloadable, SafeAwaitDepth1, Stores, StoresValues } from '$types';
 import { readFile, writeFile } from '$services';
 import { noop } from 'svelte/internal';
+export { Asyncable };
 
-function empty(): Readable<never> {
+/** A Readable that always returns undefined. */
+export function empty(): Readable<undefined> {
 	return {
 		subscribe: (_run) => {
 			return noop;
@@ -21,49 +23,42 @@ function empty(): Readable<never> {
 	};
 }
 
-export function toStore<T>(getter: () => T): Readable<T>;
-export function toStore<T>(...args: any[]): Readable<never>;
-export function toStore<T extends Stores, U>(...args: any[]): Readable<U> | Writable<U> {
-	if (args.length === 1) {
-		const getter = args[0];
-		return {
-			subscribe: (run) => {
-				run(getter());
-				return noop;
-			}
-		} as Readable<U>;
-	} else if (args.length > 1 && args.every(arg => typeof arg === 'function')) {
-		const [getter, setter] = args;
-		return {
-			set: setter,
-			subscribe: (run) => {
-				run(getter());
-				return noop;
-			}
-		}
-	}
+/** Create a store from getter and setter functions. */
+// export function toStore<T>(getter: () => T): Readable<T>;
+// export function toStore<T>(getter: () => T, setter: (previousValue: T, nextValue: T) => T): Writable<T>;
+// export function toStore(...args: any[]): Readable<undefined>;
+// export function toStore<T>(...args: any[]): Readable<T | undefined> | Writable<T | undefined> {
+// 	if (args.length === 1) {
+// 		const getter = args[0];
+// 		const { subscribe } = asyncable(getter);
+// 		return { subscribe } as Readable<T>;
+// 	} else if (args.length > 1 && args.every(arg => typeof arg === 'function')) {
+// 		const [getter, setter] = args;
+// 		const { subscribe, set, update } = asyncable(getter, setter);
+// 		return { subscribe, set, update } as Writable<T>;
+// 	}
 
-	console.error('Invalid arguments passed to `toStore`');
-	return empty();
-}
+// 	console.error('Invalid arguments passed to `toStore`');
+// 	return empty();
+// }
 
-/** @deprecated Just use normal `derived`. */
-export function asyncDerived<T extends Stores, U extends Promise<any>>(
-	stores: T,
-	fn: ($stores: StoresValues<T>) => U
-): Asyncable<Awaited<U>> {
-	return asyncable(
-		(...stores: StoresValues<T>) => fn(stores),
-		undefined,
-		// @ts-ignore
-		stores
-	);
-}
+// /** @deprecated Just use normal `derived`. */
+// export function asyncDerived<T extends Stores, U extends Promise<any>>(
+// 	stores: T,
+// 	fn: ($stores: StoresValues<T>) => U
+// ): Asyncable<Awaited<U>> {
+// 	return asyncable(
+// 		(...stores: StoresValues<T>) => fn(stores),
+// 		undefined,
+// 		// @ts-ignore
+// 		stores
+// 	);
+// }
 
 export function reloadable<T extends Promise<any>>(getter: () => T): Reloadable<T>;
 export function reloadable<T extends Stores, U extends Promise<any>>(
 	stores: T,
-	getter: ($stores: StoresValues<T>) => U,
+	getter: ($stores: StoresValues<T>) => U
 ): Reloadable<U>;
 export function reloadable(...args: any[]): Reloadable<any> {
 	const [stores, getter] = args.length === 1 ? [[], args[0]] : args;
@@ -102,7 +97,7 @@ export function counter(start = 0) {
 	return {
 		inc: () => update((n) => n + 1),
 		dec: () => update((n) => n - 1),
-		reset : () => update(() => start),
+		reset: () => update(() => start),
 		get get() {
 			return get({ subscribe });
 		},
@@ -110,18 +105,37 @@ export function counter(start = 0) {
 	};
 }
 
-/** @deprecated Shouldn't convert things to Asyncable, just use a regular store that contains a promise. */
-export function toAsyncable<T>(source: Readable<T>): Asyncable<T>;
-export function toAsyncable<T>(source: Writable<T>, options?: { readonly?: boolean }): Asyncable<T>;
-export function toAsyncable<T>(
-	source: Writable<T> | Readable<T>,
-	options: { readonly?: boolean } = {}
-) {
+/**
+ * Create an Asynable. This is effectively a wrapper for `asyncable` from `svelte-asyncable` that fixed some
+ * typing issues and adds some convenience.
+ */
+export function asyncable<T>(
+	getter: () => T,
+	setter?: (newValue: SafeAwaitDepth1<T>, oldValue?: SafeAwaitDepth1<T>) => T | Promise<T> | void | Promise<void>
+): Asyncable<SafeAwaitDepth1<T>>;
+export function asyncable<T extends Stores, U>(
+	stores: T,
+	getter: ($stores: T) => U,
+	setter?: (newValue: SafeAwaitDepth1<U>, oldValue?: SafeAwaitDepth1<U>) => U | Promise<U> | void | Promise<void>
+): Asyncable<SafeAwaitDepth1<U>>;
+export function asyncable<T>(source: Readable<T>): Asyncable<SafeAwaitDepth1<T>>;
+export function asyncable<T>(source: Writable<T>, options?: { readonly?: boolean }): Asyncable<SafeAwaitDepth1<T>>;
+export function asyncable<T>(...args: any[]) {
+	if (typeof args[0] === 'function') {
+		const [getter, setter] = args;
+		return _asyncable(getter, setter);
+	} else if ('subscribe' in args[0] && typeof args[1] === 'function') {
+		const [source, getter, setter] = args;
+		return _asyncable(getter, setter, Array.isArray(source) ? source : [source] as any);
+	}
+
+	// Handle cases where Readables or Writables and options are passed:
+	const [source, options = {}] = args;
 	const setter = !options.readonly && 'set' in source ? (value: T) => source.set(value) : undefined;
-	return asyncable(async ($source: Promise<T>) => $source, setter, [source]);
+	return _asyncable(async ($source: Promise<T>) => $source, setter, [source]);
 }
 
-export class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
+class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 	// TODO: Could maybe make this class more efficient by using a map<ID, array index>.
 	// Also, there's no internal ID checking against values already in the store.
 	constructor(protected source: Asyncable<T[]>) {}
@@ -138,13 +152,13 @@ export class EntityStore<T extends Identifiable> implements Readable<Promise<T[]
 		return entities;
 	}
 
-	select(id: string): Asyncable<T | undefined> {
-		return asyncable(
-			async ($source: Promise<T[]>) => (await $source).find((e) => e.id === id),
-			(value: T) => this.update(id, () => value),
-			[this.source]
-		);
-	}
+	// select(id: string): Asyncable<T | undefined> {
+	// 	return asyncable(
+	// 		this.source
+	// 		async ($source) => (await $source).find((e) => e.id === id),
+	// 		(value: T) => this.update(id, () => value),
+	// 	);
+	// }
 
 	set(...values: (Partial<T> & Identifiable)[]) {
 		this.source.update((entities) => {

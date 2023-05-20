@@ -52,3 +52,5 @@ export type StoresValues<T> = T extends Readable<infer U>
 	: {
 			[K in keyof T]: T[K] extends Readable<infer U> ? U : never;
 	  };
+
+export type SafeAwaitDepth1<T> = T extends Promise<infer U> ? U : T;
