@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	counter,
-	reloadable,
-	empty,
-	fileStore,
-	entityStore,
-	asyncable
-} from './stores-util';
+import { counter, reloadable, empty, fileStore, entityStore, asyncable } from './stores-util';
 import { iife, sleep } from './misc';
 import { derived, get, readable, writable } from 'svelte/store';
 import { once } from 'lodash-es';
@@ -140,6 +133,12 @@ describe('stores-utils.ts', () => {
 		const s1 = asyncable(() => sleep(50));
 		expect(await s1.get()).toBe(50);
 		expect(s1.get()).instanceOf(Promise);
+
+		const d = asyncable(s1, ($s1) => $s1.then((n) => n + 1));
+		expect(await d.get()).toBe(51);
+
+		const d2 = asyncable([s1, d], async ([$s1, $d]) => (await $d) + (await $s1));
+		expect(await d2.get()).toBe(101);
 	});
 
 	// Doesn't work in node, must be in browser:

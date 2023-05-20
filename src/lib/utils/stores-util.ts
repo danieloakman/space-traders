@@ -23,38 +23,6 @@ export function empty(): Readable<undefined> {
 	};
 }
 
-/** Create a store from getter and setter functions. */
-// export function toStore<T>(getter: () => T): Readable<T>;
-// export function toStore<T>(getter: () => T, setter: (previousValue: T, nextValue: T) => T): Writable<T>;
-// export function toStore(...args: any[]): Readable<undefined>;
-// export function toStore<T>(...args: any[]): Readable<T | undefined> | Writable<T | undefined> {
-// 	if (args.length === 1) {
-// 		const getter = args[0];
-// 		const { subscribe } = asyncable(getter);
-// 		return { subscribe } as Readable<T>;
-// 	} else if (args.length > 1 && args.every(arg => typeof arg === 'function')) {
-// 		const [getter, setter] = args;
-// 		const { subscribe, set, update } = asyncable(getter, setter);
-// 		return { subscribe, set, update } as Writable<T>;
-// 	}
-
-// 	console.error('Invalid arguments passed to `toStore`');
-// 	return empty();
-// }
-
-// /** @deprecated Just use normal `derived`. */
-// export function asyncDerived<T extends Stores, U extends Promise<any>>(
-// 	stores: T,
-// 	fn: ($stores: StoresValues<T>) => U
-// ): Asyncable<Awaited<U>> {
-// 	return asyncable(
-// 		(...stores: StoresValues<T>) => fn(stores),
-// 		undefined,
-// 		// @ts-ignore
-// 		stores
-// 	);
-// }
-
 export function reloadable<T extends Promise<any>>(getter: () => T): Reloadable<T>;
 export function reloadable<T extends Stores, U extends Promise<any>>(
 	stores: T,
@@ -111,22 +79,39 @@ export function counter(start = 0) {
  */
 export function asyncable<T>(
 	getter: () => T,
-	setter?: (newValue: SafeAwaitDepth1<T>, oldValue?: SafeAwaitDepth1<T>) => T | Promise<T> | void | Promise<void>
+	setter?: (
+		newValue: SafeAwaitDepth1<T>,
+		oldValue?: SafeAwaitDepth1<T>
+	) => T | Promise<T> | void | Promise<void>
 ): Asyncable<SafeAwaitDepth1<T>>;
 export function asyncable<T extends Stores, U>(
 	stores: T,
-	getter: ($stores: T) => U,
-	setter?: (newValue: SafeAwaitDepth1<U>, oldValue?: SafeAwaitDepth1<U>) => U | Promise<U> | void | Promise<void>
+	getter: ($values: StoresValues<T>) => U,
+	setter?: (
+		newValue: SafeAwaitDepth1<U>,
+		oldValue?: SafeAwaitDepth1<U>
+	) => U | Promise<U> | void | Promise<void>
 ): Asyncable<SafeAwaitDepth1<U>>;
 export function asyncable<T>(source: Readable<T>): Asyncable<SafeAwaitDepth1<T>>;
-export function asyncable<T>(source: Writable<T>, options?: { readonly?: boolean }): Asyncable<SafeAwaitDepth1<T>>;
+export function asyncable<T>(
+	source: Writable<T>,
+	options?: { readonly?: boolean }
+): Asyncable<SafeAwaitDepth1<T>>;
 export function asyncable<T>(...args: any[]) {
 	if (typeof args[0] === 'function') {
 		const [getter, setter] = args;
-		return _asyncable(getter, setter);
-	} else if ('subscribe' in args[0] && typeof args[1] === 'function') {
+		return _asyncable((...values: any[]) => getter(values.length > 1 ? values : values[0]), setter);
+	} else if (
+		('subscribe' in args[0] ||
+			(Array.isArray(args[0]) && args[0].every((arg) => 'subscribe' in arg))) &&
+		typeof args[1] === 'function'
+	) {
 		const [source, getter, setter] = args;
-		return _asyncable(getter, setter, Array.isArray(source) ? source : [source] as any);
+		return _asyncable(
+			(...values: any[]) => getter(values.length > 1 ? values : values[0]),
+			setter,
+			Array.isArray(source) ? source : ([source] as any)
+		);
 	}
 
 	// Handle cases where Readables or Writables and options are passed:
