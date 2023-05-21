@@ -14,7 +14,7 @@ import {
 	type Waypoint
 } from 'spacetraders-sdk';
 import { derived, get, type Readable } from 'svelte/store';
-import { unwrapData, reloadable } from '$utils';
+import { unwrapData, reloadable, toMS, handleError } from '$utils';
 import iter from 'iteragain/iter';
 
 export class SpaceTradersAPI {
@@ -45,9 +45,24 @@ export class SpaceTradersAPI {
 		this.factionsAPI = derived(this.config, this.createFactionsApi);
 		this.fleetAPI = derived(this.config, this.createFleetApi);
 		this.myAgent = reloadable([this.agentsAPI], ([agentsAPI]) => {
-			console.log('getting my agent');
-			console.log('agentsAPI', agentsAPI);
-			return agentsAPI.getMyAgent().then(unwrapData);
+			return agentsAPI
+				.getMyAgent()
+				.then(unwrapData)
+				.catch(
+					handleError((err) => {
+						const hideToast = /missing bearer token/i.test(err.message);
+						return {
+							result: {
+								accountId: 'UNKNOWN',
+								credits: 0,
+								headquarters: 'UNKNOWN',
+								symbol: 'UNKNOWN'
+							} as Agent,
+							hideToast,
+							timeout: toMS(5, 'seconds')
+						};
+					})
+				);
 		});
 		this.headquarters = reloadable([this.myAgent], async ([myAgent]) =>
 			this.waypoint((await myAgent).headquarters)
@@ -58,7 +73,7 @@ export class SpaceTradersAPI {
 		symbol: string,
 		faction: RegisterRequestFactionEnum,
 		email?: string
-	): Promise<RegisterResponse> {
+	): Promise<RegisterResponse | null> {
 		const res = await this.defaultAPI
 			.register({
 				registerRequest: {
@@ -67,7 +82,8 @@ export class SpaceTradersAPI {
 					email
 				}
 			})
-			.then(unwrapData);
+			.then(unwrapData)
+			.catch(handleError(() => ({ result: null })));
 		return res;
 	}
 
@@ -84,7 +100,22 @@ export class SpaceTradersAPI {
 		const wp = fullWaypoint(...args);
 		const systemSymbol = wp.system;
 		const waypointSymbol = wp.waypoint;
-		return get(this.systemsAPI).getWaypoint({ systemSymbol, waypointSymbol }).then(unwrapData);
+		return get(this.systemsAPI)
+			.getWaypoint({ systemSymbol, waypointSymbol })
+			.then(unwrapData)
+			.catch(
+				handleError(() => ({
+					result: {
+						symbol: 'UNKOWN',
+						systemSymbol: 'UNKNOWN',
+						type: 'PLANET',
+						x: 0,
+						y: 0,
+						orbitals: [] as any,
+						traits: [] as any
+					} as Waypoint
+				}))
+			);
 	}
 
 	contracts(limit?: number, page?: number) {
