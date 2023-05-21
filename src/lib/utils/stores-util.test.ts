@@ -141,8 +141,22 @@ describe('stores-utils.ts', () => {
 		expect(await d2.get()).toBe(101);
 
 		const w = asyncable(writable(5));
-		w.update(n => n + 1);
+		w.update((n) => n + 1);
 		expect(await w.get()).toBe(6);
+		expect(w.get()).instanceOf(Promise);
+		w.set(7);
+		expect(await w.get()).toBe(7);
+		const c = counter();
+		w.subscribe(() => c.inc());
+		w.update((n) => n + 1);
+		expect(await w.get()).toBe(8);
+		expect(get(c)).toBe(2);
+
+		const r = asyncable(readable(5, () => {}));
+		expect(await r.get()).toBe(5);
+		expect(r.get()).instanceOf(Promise);
+		r.set(7);
+		expect(await r.get()).toBe(5);
 	});
 
 	// Doesn't work in node, must be in browser:
@@ -153,9 +167,9 @@ describe('stores-utils.ts', () => {
 	// });
 
 	it('entityStore', async () => {
-		const store = entityStore(asyncable(writable<{ id: string, name: string }[]>([])));
+		const store = entityStore(asyncable(writable<{ id: string; name: string }[]>([])));
 		store.create({ id: '1', name: 'test' });
-		const entity = store.select('1')
+		const entity = store.select('1');
 		expect(await entity.get()).toStrictEqual({ id: '1', name: 'test' });
 	});
 });

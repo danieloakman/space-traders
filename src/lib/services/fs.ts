@@ -17,7 +17,7 @@ export async function writeFile(path: string, data: any, directory = Directory.D
 
 export async function readFile<T = any>(
 	path: string,
-	directory = Directory.Data,
+	directory = Directory.Data
 ): Promise<T | null> {
 	try {
 		const file = await fs.readFile({

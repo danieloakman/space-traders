@@ -116,18 +116,13 @@ export function asyncable<T>(...args: any[]) {
 
 	// Handle cases where Readables or Writables and options are passed:
 	const [source, options = {}] = args;
-	const setter = !options.readonly && 'set' in source ? (value: T) => {
-		source.set(value)
-		return value;
-	} : undefined;
 	return {
 		subscribe: source.subscribe,
-		get: () => get(source),
-		set: setter,
-		update: (fn: (value: T) => T) => source.update(fn)
-	}
-	// return asyncable(source, () => get(source), setter as any);
-	// return _asyncable(async ($source: Promise<T>) => $source, setter, [source]);
+		get: async () => get(source),
+		// Just silently ignore the setter if the source is readonly with using `noop`:
+		set: !options.readonly && 'set' in source ? source.set : noop,
+		update: !options.readonly && 'update' in source ? source.update : noop
+	};
 }
 
 class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
@@ -151,11 +146,11 @@ class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 		return asyncable(
 			this.source,
 			async ($source) => {
-				return (await $source).find((e) => e.id === id)
+				return (await $source).find((e) => e.id === id);
 			},
 			(value) => {
-				if (value) this.update(id, () => value)
-			},
+				if (value) this.update(id, () => value);
+			}
 		);
 	}
 
