@@ -6,7 +6,7 @@
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
 
-	import { AppShell, AppBar, TabGroup, Tab } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, TabGroup, Tab, Toast } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
 	import {
 		Home,
@@ -161,3 +161,5 @@
 		{/await} -->
 	{/if}
 </Drawer>
+
+<Toast />
