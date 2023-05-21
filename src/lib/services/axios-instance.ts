@@ -10,6 +10,8 @@ axios.interceptors.response.use(undefined, async (e) => {
 	if (e.response?.status === 429) {
 		const retryAfter = e.response.headers['retry-after'];
 
+		console.debug('Rate limited, retrying after', retryAfter, 'seconds');
+
 		await sleep(retryAfter * 1000);
 
 		return axios.request(e.config);
