@@ -16,6 +16,7 @@ import {
 import { derived, get, type Readable } from 'svelte/store';
 import { unwrapData, reloadable, toMS, handleError } from '$utils';
 import iter from 'iteragain/iter';
+import { truncate } from 'lodash-es';
 
 export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
@@ -98,7 +99,7 @@ export class SpaceTradersAPI {
 			.catch(
 				handleError((err) => ({
 					result: null,
-					message: `Could not find an agent with token "${token}"`
+					message: `Could not find an agent with token: "${truncate(token, { length: 20 })}"`
 				}))
 			);
 	}
