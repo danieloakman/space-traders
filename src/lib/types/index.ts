@@ -67,3 +67,8 @@ export interface StoreMethods<
 	set: TSet;
 	update: TUpdate;
 }
+
+export interface Pagination {
+	limit?: number;
+	page?: number;
+}

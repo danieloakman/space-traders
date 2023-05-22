@@ -46,11 +46,11 @@
 				symbol: result.agent.symbol,
 				token: result.token
 			});
-      toastStore.trigger({
-        message: `Added "${result.agent.symbol}" to your saved agents.`,
-        timeout: 3000,
-        background: 'bg-green-500',
-      });
+			toastStore.trigger({
+				message: `Added "${result.agent.symbol}" to your saved agents.`,
+				timeout: 3000,
+				background: 'bg-green-500'
+			});
 		}}
 	>
 		Submit

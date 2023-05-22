@@ -1,4 +1,4 @@
-import type { RegisterResponse, FullWaypoint, Reloadable } from '$lib/types';
+import type { RegisterResponse, FullWaypoint, Reloadable, Pagination } from '$lib/types';
 import { SPACE_TRADERS_URL } from '../constants';
 import axios from './axios-instance';
 import {
@@ -20,20 +20,27 @@ import { truncate } from 'lodash-es';
 
 export class SpaceTradersAPI {
 	protected readonly config: Readable<Configuration>;
-	protected readonly agentsAPI: Readable<AgentsApi>;
-	protected readonly systemsAPI: Readable<SystemsApi>;
-	protected readonly contractsAPI: Readable<ContractsApi>;
-	protected readonly factionsAPI: Readable<FactionsApi>;
-	protected readonly fleetAPI: Readable<FleetApi>;
-	/** The current agent's details. */
-	readonly myAgent: Reloadable<Promise<Agent>>;
-	/** The current agent's headquarters. */
-	readonly headquarters: Reloadable<Promise<Waypoint>>;
 	protected readonly defaultAPI = new DefaultApi(
 		this.createConfig({ token: '' }),
 		undefined,
 		axios
 	);
+	protected readonly agentsAPI: Readable<AgentsApi>;
+	protected readonly systemsAPI: Readable<SystemsApi>;
+	protected readonly contractsAPI: Readable<ContractsApi>;
+	protected readonly factionsAPI: Readable<FactionsApi>;
+	protected readonly fleetAPI: Readable<FleetApi>;
+
+	readonly status = reloadable<Promise<object | null>>(async () =>
+		axios
+			.get(SPACE_TRADERS_URL)
+			.then(unwrapData)
+			.catch(handleError(() => ({ result: {} })))
+	);
+	/** The current agent's details. */
+	readonly myAgent: Reloadable<Promise<Agent>>;
+	/** The current agent's headquarters. */
+	readonly headquarters: Reloadable<Promise<Waypoint>>;
 
 	constructor(
 		/** The agent token to use for all relevant API calls. */
@@ -104,8 +111,11 @@ export class SpaceTradersAPI {
 			);
 	}
 
-	systems(limit?: number, page?: number) {
-		return get(this.systemsAPI).getSystems({ limit, page }).then(unwrapData);
+	systems({ limit, page }: Pagination) {
+		return get(this.systemsAPI)
+			.getSystems({ limit, page })
+			.then(unwrapData)
+			.catch(handleError(() => ({ result: [] })));
 	}
 
 	waypoint(...args: string[]): Promise<Waypoint> {
@@ -128,6 +138,13 @@ export class SpaceTradersAPI {
 					} as Waypoint
 				}))
 			);
+	}
+
+	waypoints(systemSymbol: string, pagination?: Pagination) {
+		return get(this.systemsAPI)
+			.getSystemWaypoints({ systemSymbol, ...pagination })
+			.then(unwrapData)
+			.catch(handleError(() => ({ result: [] })));
 	}
 
 	contracts(limit?: number, page?: number) {

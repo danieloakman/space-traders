@@ -14,14 +14,14 @@
 		savedAgents.create({
 			id: fastHash(JSON.stringify(result)).toString(),
 			symbol: result.symbol,
-			token: token,
+			token: token
 		});
-    toastStore.trigger({
-      message: `Added "${result.symbol}" to your saved agents.`,
-      timeout: toMS(3, 's'),
-      background: 'bg-green-500',
-    })
-    token = '';
+		toastStore.trigger({
+			message: `Added "${result.symbol}" to your saved agents.`,
+			timeout: toMS(3, 's'),
+			background: 'bg-green-500'
+		});
+		token = '';
 	}, 500);
 
 	$: if (token) addToken();
