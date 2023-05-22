@@ -168,8 +168,10 @@ describe('stores-utils.ts', () => {
 
 	it('entityStore', async () => {
 		const store = entityStore(asyncable(writable<{ id: string; name: string }[]>([])));
-		store.create({ id: '1', name: 'test' });
-		const entity = store.select('1');
-		expect(await entity.get()).toStrictEqual({ id: '1', name: 'test' });
+		store.create({ id: '1', name: 'test' }, { id: '2', name: 'Hello' });
+		expect(await store.get()).toStrictEqual([
+			{ id: '1', name: 'test' },
+			{ id: '2', name: 'Hello' }
+		]);
 	});
 });

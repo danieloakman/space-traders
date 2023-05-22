@@ -87,9 +87,20 @@ export class SpaceTradersAPI {
 		return res;
 	}
 
-	/** Returns Agent data from a separate token. Does not return the agent details for the current agent. That */
-	agent(token: string): Promise<Agent> {
-		return this.createAgentsApi(this.createConfig({ token })).getMyAgent().then(unwrapData);
+	/**
+	 * Returns Agent data from a separate token. Does not return the agent details for the current agent.
+	 * That's what `myAgent` is for.
+	 */
+	agent(token: string): Promise<Agent | null> {
+		return this.createAgentsApi(this.createConfig({ token }))
+			.getMyAgent()
+			.then(unwrapData)
+			.catch(
+				handleError((err) => ({
+					result: null,
+					message: `Could not find an agent with token "${token}"`
+				}))
+			);
 	}
 
 	systems(limit?: number, page?: number) {

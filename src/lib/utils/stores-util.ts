@@ -1,15 +1,14 @@
-import {
-	writable,
-	type Readable,
-	derived,
-	type Writable,
-	get,
-	type Subscriber,
-	type Unsubscriber,
-	readable
-} from 'svelte/store';
+import { writable, type Readable, derived, type Writable, get } from 'svelte/store';
 import { asyncable as _asyncable, type Asyncable } from 'svelte-asyncable';
-import type { Identifiable, Reloadable, SafeAwaitDepth1, Stores, StoresValues } from '$types';
+import type {
+	HasGet,
+	Identifiable,
+	Reloadable,
+	SafeAwaitDepth1,
+	StoreMethods,
+	Stores,
+	StoresValues
+} from '$types';
 import { readFile, writeFile } from '$services';
 import { noop } from 'svelte/internal';
 export { Asyncable };
@@ -125,7 +124,7 @@ export function asyncable<T>(...args: any[]) {
 	};
 }
 
-class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
+export class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 	// TODO: Could maybe make this class more efficient by using a map<ID, array index>.
 	// Also, there's no internal ID checking against values already in the store.
 	constructor(protected source: Asyncable<T[]>) {}
@@ -142,7 +141,15 @@ class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 		return entities;
 	}
 
-	select(id: string): Asyncable<T | undefined> {
+	// Don't think this method is a good idea. Just not type safe enough:
+	select(
+		id: string
+	): StoreMethods<
+		Promise<T | undefined>,
+		(value: Partial<T> & Identifiable) => void,
+		(fn: (value: T) => Partial<T>) => void
+	> &
+		HasGet<Promise<T | undefined>> {
 		return asyncable(
 			this.source,
 			async ($source) => {
@@ -151,7 +158,7 @@ class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 			(value) => {
 				if (value) this.update(id, () => value);
 			}
-		);
+		) as any;
 	}
 
 	set(...values: (Partial<T> & Identifiable)[]) {
@@ -183,7 +190,6 @@ class EntityStore<T extends Identifiable> implements Readable<Promise<T[]>> {
 		this.source.update((entities) => {
 			for (let i = entities.length - 1; i >= 0; i--) {
 				if (ids.includes(entities[i].id)) {
-					console.log('deleting', entities[i]);
 					entities.splice(i, 1);
 				}
 			}

@@ -54,3 +54,16 @@ export type StoresValues<T> = T extends Readable<infer U>
 	  };
 
 export type SafeAwaitDepth1<T> = T extends Promise<infer U> ? U : T;
+
+export interface HasGet<T> {
+	get: () => T;
+}
+
+export interface StoreMethods<
+	TGet,
+	TSet extends (value: any) => void,
+	TUpdate extends (fn: (value: any) => any) => void
+> extends Readable<TGet> {
+	set: TSet;
+	update: TUpdate;
+}
