@@ -9,15 +9,15 @@
 	import { AppShell, AppBar, TabGroup, Tab, Toast } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
 	import {
-		Home,
-		ReceiptLong,
-		Rocket,
-		Map,
-		ChevronLeft,
-		Menu,
-		MenuOpen,
-		Refresh,
-		Groups
+		HomeIcon,
+		ReceiptLongIcon,
+		RocketIcon,
+		MapIcon,
+		ChevronLeftIcon,
+		MenuIcon,
+		MenuOpenIcon,
+		RefreshIcon,
+		GroupsIcon
 	} from '$icons';
 	import { derived, get, writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
@@ -61,7 +61,7 @@
 					class="btn-icon btn-sm variant-filled-primary my-0 py-0"
 					on:click={() => goBack($routes)}
 				>
-					<ChevronLeft />
+					<ChevronLeftIcon />
 				</button>
 			</svelte:fragment>
 
@@ -73,9 +73,9 @@
 					on:click={() => ($isDrawerOpen ? drawerStore.close() : drawerStore.open())}
 				>
 					{#if $isDrawerOpen}
-						<MenuOpen />
+						<MenuOpenIcon />
 					{:else}
-						<Menu />
+						<MenuIcon />
 					{/if}
 				</button>
 			</svelte:fragment>
@@ -101,23 +101,23 @@
 			class="bg-surface-100-800-token w-full"
 		>
 			<Tab bind:group={$tabSet} name="Home" value={'/'}>
-				<svelte:fragment slot="lead"><Home /></svelte:fragment>
+				<svelte:fragment slot="lead"><HomeIcon /></svelte:fragment>
 			</Tab>
 
 			<Tab bind:group={$tabSet} name="Contracts" value={'/contracts'}>
-				<svelte:fragment slot="lead"><ReceiptLong /></svelte:fragment>
+				<svelte:fragment slot="lead"><ReceiptLongIcon /></svelte:fragment>
 			</Tab>
 
 			<Tab bind:group={$tabSet} name="Navigation" value={'/navigation'}>
-				<svelte:fragment slot="lead"><Map /></svelte:fragment>
+				<svelte:fragment slot="lead"><MapIcon /></svelte:fragment>
 			</Tab>
 
 			<Tab bind:group={$tabSet} name="fleet" value={'/fleet'}>
-				<svelte:fragment slot="lead"><Rocket /></svelte:fragment>
+				<svelte:fragment slot="lead"><RocketIcon /></svelte:fragment>
 			</Tab>
 
 			<Tab bind:group={$tabSet} name="factions" value={'/factions'}>
-				<svelte:fragment slot="lead"><Groups /></svelte:fragment>
+				<svelte:fragment slot="lead"><GroupsIcon /></svelte:fragment>
 			</Tab>
 		</TabGroup>
 	</svelte:fragment>
@@ -136,7 +136,7 @@
 		<div class="m-4 flex justify-between">
 			<button />
 			<button class="btn-icon variant-filled-primary" on:click={() => myAgent.reload()}>
-				<Refresh />
+				<RefreshIcon />
 			</button>
 		</div>
 

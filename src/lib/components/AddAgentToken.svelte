@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Close } from '$icons';
+	import { CloseIcon } from '$icons';
 	import { api, currentToken, savedAgents } from '$stores';
 	import { fastHash, toMS } from '$utils';
 	import { ListBox, ListBoxItem, clipboard, toastStore } from '@skeletonlabs/skeleton';
@@ -60,7 +60,7 @@
 								savedAgents.delete(agent.id);
 							}}
 						>
-							<Close />
+							<CloseIcon />
 						</button>
 					</ListBoxItem>
 				</ListBox>
