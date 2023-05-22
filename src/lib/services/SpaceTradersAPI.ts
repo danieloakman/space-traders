@@ -11,7 +11,8 @@ import {
 	FleetApi,
 	type Agent,
 	type RegisterRequestFactionEnum,
-	type Waypoint
+	type Waypoint,
+	type System
 } from 'spacetraders-sdk';
 import { derived, get, type Readable } from 'svelte/store';
 import { unwrapData, reloadable, toMS, handleError } from '$utils';
@@ -111,7 +112,7 @@ export class SpaceTradersAPI {
 			);
 	}
 
-	systems({ limit, page }: Pagination) {
+	systems({ limit, page }: Pagination = {}): Promise<System[]> {
 		return get(this.systemsAPI)
 			.getSystems({ limit, page })
 			.then(unwrapData)
