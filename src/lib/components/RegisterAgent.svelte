@@ -2,7 +2,7 @@
 	import { FACTIONS } from '$constants';
 	import { api, savedAgents } from '$stores';
 	import { fastHash } from '$utils';
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+	import { RadioGroup, RadioItem, toastStore } from '@skeletonlabs/skeleton';
 	import type { RegisterRequestFactionEnum } from 'spacetraders-sdk';
 
 	const agentRegister = {
@@ -35,7 +35,7 @@
 	</RadioGroup>
 
 	<button
-		disabled={!agentRegister.symbol || !agentRegister.faction}
+		disabled={!agentRegister.symbol || !agentRegister.faction || agentRegister.symbol.length < 3}
 		type="button"
 		class="btn variant-filled-primary"
 		on:click={async () => {
@@ -46,6 +46,11 @@
 				symbol: result.agent.symbol,
 				token: result.token
 			});
+      toastStore.trigger({
+        message: `Added "${result.agent.symbol}" to your saved agents.`,
+        timeout: 3000,
+        background: 'bg-green-500',
+      });
 		}}
 	>
 		Submit
