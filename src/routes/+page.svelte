@@ -17,7 +17,9 @@
 	<svelte:fragment slot="panel">
 		{#if tabSet === 0}
 			{#await $gameStatus then gameStatus}
-				<JsonView json={gameStatus} depth={0}/>
+				<div class="p-2 pt-0 mt-0">
+					<JsonView json={gameStatus} depth={0} />
+				</div>
 			{/await}
 		{:else if tabSet === 1}
 			<AddAgentToken />
