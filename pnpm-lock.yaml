@@ -3277,7 +3277,7 @@ packages:
     dev: true
 
   file:packages/spacetraders-sdk-2.0.0.tgz:
-    resolution: {integrity: sha512-YG4bFm+kFwBvykB3A1WaGlnjnH27XyDij/+bwcYGSVfbq2Ryd3+LtXHBXW/t86jPJJ18mACBl6nVRGGiIvki/g==, tarball: file:packages/spacetraders-sdk-2.0.0.tgz}
+    resolution: {integrity: sha512-NVC1d6bSDfMr4cMQhraVRKSaL3FMaOUZPyQhVDRmSbb7NVtPhrXXgpEOsCQ6IDvDLHk+0K3pnlUmqSRpzsc50w==, tarball: file:packages/spacetraders-sdk-2.0.0.tgz}
     name: spacetraders-sdk
     version: 2.0.0
     dependencies:
